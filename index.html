@@ -14,12 +14,12 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <style>
-/* Layout: a color portrait over a blurred wash of itself (like Apple Music's Now Playing).
-   iOS system type and controls; every person carries one system tint that recolors the UI. */
+/* Layout: a color portrait over a blurred wash of itself (like Apple Music's Now Playing), their words as the hero.
+   iOS system type and controls; every person carries one system tint that recolors the UI. Swipe like a carousel. */
 :root {
   --black: #000;
   --label: #fff;
-  --label-2: rgba(235, 235, 245, .64);
+  --label-2: rgba(235, 235, 245, .66);
   --label-3: rgba(235, 235, 245, .34);
   --fill: rgba(118, 118, 128, .30);
   --fill-2: rgba(118, 118, 128, .18);
@@ -63,14 +63,16 @@ a { color: var(--tint-text); text-decoration: none; }
   position: relative; width: 100%; height: 100%;
   max-width: 62vh; max-width: 60dvh;
   overflow: hidden; background: var(--black);
-  touch-action: none; cursor: pointer; outline: none;
+  touch-action: none; cursor: grab; outline: none;
 }
+.stage.dragging { cursor: grabbing; }
 @media (max-aspect-ratio: 3/4) { .stage { max-width: none; } }
 
 /* ── cards ─────────────────────────────────── */
 .deck { position: absolute; inset: 0; }
-.card { position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease; }
-.card.in { opacity: 1; }
+.card { position: absolute; inset: 0; overflow: hidden; background: var(--black); will-change: transform; }
+.card.enter { animation: enter .7s ease both; }
+@keyframes enter { from { opacity: 0; } to { opacity: 1; } }
 
 .wash {
   position: absolute; inset: -12%;
@@ -79,48 +81,32 @@ a { color: var(--tint-text); text-decoration: none; }
 }
 .wash::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.25) 55%, rgba(0,0,0,.55) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.28) 50%, rgba(0,0,0,.6) 100%);
 }
 .photo { position: absolute; inset: 0; overflow: hidden; }
 .kb { position: absolute; inset: 0; animation: kb 16s cubic-bezier(.2, .6, .3, 1) both; }
 @keyframes kb { from { transform: scale(1.07); } to { transform: scale(1); } }
 .photo img {
-  position: absolute; left: 0; top: 0; max-width: none; user-select: none; -webkit-user-drag: none;
-  -webkit-mask-image: linear-gradient(180deg, #000 66%, transparent 98%);
-  mask-image: linear-gradient(180deg, #000 66%, transparent 98%);
+  position: absolute; left: 0; top: 0; max-width: none; user-select: none; -webkit-user-drag: none; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 96%);
+  mask-image: linear-gradient(180deg, #000 62%, transparent 96%);
 }
 .top-shade { position: absolute; left: 0; right: 0; top: 0; height: 140px; background: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,0)); pointer-events: none; }
 
 .copy {
   position: absolute; left: 0; right: 0; bottom: 0;
   padding: 0 var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 22px);
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: 12px;
 }
-.copy > * { opacity: 0; transform: translateY(14px); transition: opacity .55s ease, transform .8s cubic-bezier(.2, .8, .2, 1); }
-.card.in .copy > * { opacity: 1; transform: none; }
-.card.in .copy > :nth-child(1) { transition-delay: .10s; }
-.card.in .copy > :nth-child(2) { transition-delay: .16s; }
-.card.in .copy > :nth-child(3) { transition-delay: .24s; }
-.card.in .copy > :nth-child(4) { transition-delay: .30s; }
-.card.in .copy > :nth-child(5) { transition-delay: .36s; }
 
-.tally { display: flex; align-items: baseline; gap: 4px; }
-.num {
-  font: 800 clamp(84px, 26vw, 112px)/.92 var(--f-round); letter-spacing: -.045em;
-  font-variant-numeric: tabular-nums;
-  background: linear-gradient(180deg, #fff 35%, color-mix(in oklab, var(--tint) 60%, white));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  padding-right: .04em;
-}
-.unit { font: 700 34px/1 var(--f-round); letter-spacing: -.02em; color: var(--tint-text); }
-.since { margin-top: -2px; font: 600 15px/1.3 var(--f-text); letter-spacing: -.01em; color: var(--label-2); }
-
-.quote { margin: 8px 0 0; font: 600 25px/1.2 var(--f-display); letter-spacing: -.022em; text-wrap: balance; }
-.quote.l { font-size: 22px; }
-.quote.xl { font-size: 19.5px; line-height: 1.26; }
-.quote.roman { font: 800 58px/1 var(--f-round); letter-spacing: .01em; }
-.quote:lang(ja) { font-family: var(--f-ja); font-weight: 700; font-size: 25px; line-height: 1.4; letter-spacing: .02em; }
-.ko { margin: 0; font: 400 16px/1.5 var(--f-text); letter-spacing: -.01em; color: var(--label-2); word-break: keep-all; text-wrap: pretty; }
+.qmark { display: block; height: 30px; margin-bottom: -2px; font: 800 72px/1 var(--f-display); color: var(--tint-text); }
+.quote { margin: 0; font: 700 31px/1.14 var(--f-display); letter-spacing: -.028em; text-wrap: balance; }
+.quote.m { font-size: 27px; line-height: 1.17; }
+.quote.l { font-size: 23.5px; line-height: 1.22; }
+.quote.xl { font-size: 20.5px; line-height: 1.27; letter-spacing: -.02em; }
+.quote.roman { font: 800 72px/1 var(--f-round); letter-spacing: .01em; }
+.quote:lang(ja) { font-family: var(--f-ja); font-weight: 700; letter-spacing: .02em; line-height: 1.45; }
+.ko { margin: 0; font: 400 17px/1.5 var(--f-text); letter-spacing: -.012em; color: var(--label-2); word-break: keep-all; text-wrap: pretty; }
 
 .byline { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding-top: 14px; border-top: .5px solid var(--sep); }
 .who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
@@ -134,6 +120,16 @@ a { color: var(--tint-text); text-decoration: none; }
 .more:active, .pill:active { transform: scale(.96); }
 
 /* the viewer's own card */
+.tally { display: flex; align-items: baseline; gap: 4px; }
+.num {
+  font: 800 clamp(84px, 26vw, 112px)/.92 var(--f-round); letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #fff 35%, color-mix(in oklab, var(--tint) 60%, white));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  padding-right: .04em;
+}
+.unit { font: 700 34px/1 var(--f-round); letter-spacing: -.02em; color: var(--tint-text); }
+.since { margin-top: -2px; font: 600 15px/1.3 var(--f-text); letter-spacing: -.01em; color: var(--label-2); }
 .you .wash {
   inset: 0; filter: none;
   background:
@@ -145,8 +141,8 @@ a { color: var(--tint-text); text-decoration: none; }
 .ring-wrap { position: absolute; left: 50%; top: 33%; width: 64%; max-width: 280px; aspect-ratio: 1; transform: translate(-50%, -50%); }
 .ring { width: 100%; height: 100%; display: block; }
 .ring .track { stroke: rgba(255, 255, 255, .14); }
-.ring .bar { transition: stroke-dashoffset 1.4s cubic-bezier(.3, .7, .2, 1) .25s; }
-.card.in .ring .bar { stroke-dashoffset: var(--off); }
+.ring .bar { transition: stroke-dashoffset 1.4s cubic-bezier(.3, .7, .2, 1) .2s; }
+.card.live .ring .bar { stroke-dashoffset: var(--off); }
 .ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; }
 .ring-label span { font: 600 13px/1 var(--f-text); color: var(--label-2); }
 .ring-label b { font: 800 44px/1 var(--f-round); letter-spacing: -.03em; }
@@ -207,11 +203,15 @@ a { color: var(--tint-text); text-decoration: none; }
 .facts dd { margin: 9px 0 0; font: 700 22px/1.1 var(--f-round); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .facts div:last-child dd { color: var(--tint-text); }
 .story { margin: 22px 0 0; font: 400 17px/1.62 var(--f-text); letter-spacing: -.012em; word-break: keep-all; }
-.orig { margin: 22px 0 0; padding: 16px 18px; background: var(--fill-2); border-radius: 18px; }
+.s-h { margin: 30px 0 12px; font: 700 22px/1.2 var(--f-display); letter-spacing: -.02em; }
+.quotes { display: flex; flex-direction: column; gap: 10px; }
+.orig { margin: 0; padding: 16px 18px; background: var(--fill-2); border-radius: 18px; }
+.orig.now { box-shadow: inset 0 0 0 1.5px var(--tint); }
 .orig blockquote { margin: 0; font: 600 17px/1.4 var(--f-display); letter-spacing: -.015em; }
 .orig blockquote:lang(ja) { font-family: var(--f-ja); }
-.orig figcaption { margin-top: 8px; font: 400 13px/1.45 var(--f-text); color: var(--label-2); }
-.credit { margin: 16px 4px 0; font: 400 12px/1.5 var(--f-text); color: var(--label-3); word-break: break-word; }
+.orig p { margin: 6px 0 0; font: 400 15px/1.5 var(--f-text); color: var(--label-2); word-break: keep-all; }
+.orig figcaption { margin-top: 8px; font: 400 13px/1.45 var(--f-text); color: var(--label-3); }
+.credit { margin: 18px 4px 0; font: 400 12px/1.5 var(--f-text); color: var(--label-3); word-break: break-word; }
 .credit a { color: var(--label-2); }
 
 .me-sheet h2 { margin: 2px 0 0; font: 700 28px/1.15 var(--f-display); letter-spacing: -.025em; }
@@ -230,19 +230,18 @@ a { color: var(--tint-text); text-decoration: none; }
 .btn { display: block; width: 100%; min-height: 52px; border-radius: 999px; font: 600 17px/1 var(--f-text); letter-spacing: -.01em; }
 .btn.primary { margin-top: 16px; background: var(--tint); color: var(--on-tint); }
 .btn.plain { margin-top: 6px; color: var(--destructive); }
-.btn:disabled { opacity: .3; cursor: default; }
 .me-note { text-align: center; font-size: 13px !important; color: var(--label-3) !important; }
 
 @media (prefers-reduced-motion: reduce) {
-  .kb { animation: none; }
-  .card, .copy > *, .sheet, .scrim, .ring .bar { transition-duration: .01s !important; transition-delay: 0s !important; }
+  .kb, .card.enter { animation: none; }
+  .sheet, .scrim, .ring .bar { transition-duration: .01s !important; transition-delay: 0s !important; }
 }
 </style>
 </head>
 <body>
 
 <div class="app">
-  <main class="stage" id="stage" tabindex="0" aria-label="탭하면 다음 사람">
+  <main class="stage" id="stage" tabindex="0" aria-label="옆으로 밀어서 다음 사람">
     <div class="deck" id="deck"></div>
 
     <header class="top">
@@ -253,7 +252,7 @@ a { color: var(--tint-text); text-decoration: none; }
       <button class="pill glass unset" id="me" type="button">+ 나의 시작일</button>
     </header>
 
-    <div class="hint gone" id="hint" aria-hidden="true"><span class="glass">탭하면 다음 사람 · 위로 쓸면 이야기</span></div>
+    <div class="hint gone" id="hint" aria-hidden="true"><span class="glass">옆으로 밀면 다음 사람 · 위로 밀면 이야기</span></div>
   </main>
 </div>
 
@@ -273,10 +272,8 @@ a { color: var(--tint-text); text-decoration: none; }
     <div><dt id="s-count-label">지난 날</dt><dd id="s-count"></dd></div>
   </dl>
   <p class="story" id="s-story"></p>
-  <figure class="orig">
-    <blockquote id="s-quote"></blockquote>
-    <figcaption id="s-src"></figcaption>
-  </figure>
+  <h3 class="s-h">이 사람이 한 말</h3>
+  <div class="quotes" id="s-quotes"></div>
   <p class="credit" id="s-credit"></p>
 </section>
 
@@ -299,10 +296,11 @@ a { color: var(--tint-text); text-decoration: none; }
 <script>
 /* ────────────────────────────────────────────────────────────
    DATA
-   since:  "YYYY-MM-DD" | "YYYY-MM" | "YYYY"   (기간은 매일 자동 계산)
-   approx: 연도가 추정일 때 true
-   tint:   TINTS의 키 (카드와 화면 전체의 포인트 색)
-   focus:  사진 속 얼굴 중심 [x, y] (0–1)
+   since:   "YYYY-MM-DD" | "YYYY-MM" | "YYYY"   (이야기 화면에서 매일 자동 계산)
+   approx:  연도가 추정일 때 true
+   tint:    TINTS의 키 (카드와 화면 전체의 포인트 색)
+   photos:  [파일 이름, 얼굴 중심 [x, y] (0–1)]  — 볼 때마다 이 중 하나
+   quotes:  { t: 원문, ko: 번역, s: [출처, 링크] } — 볼 때마다 이 중 하나
    ──────────────────────────────────────────────────────────── */
 const TINTS = {   // iOS 다크 모드 시스템 색상
   red:    ["#ff453a", "#fff"],
@@ -319,148 +317,294 @@ const TINTS = {   // iOS 다크 모드 시스템 색상
 };
 
 const PEOPLE = [
-  { id: "hopkins", name: "Anthony Hopkins", ko: "앤서니 홉킨스", role: "배우 · 〈양들의 침묵〉", tint: "red",
-    since: "1975-12-29", quote: "Because life is much better.", line: "인생이 훨씬 낫거든요.",
-    story: "1975년 12월 29일, 블랙아웃 상태로 차를 몰다 죽을 뻔했다. 그날 이후로 술을 마시지 않았다. 금주 50년이 되던 날 인스타그램에 영상을 올려, 술 문제가 조금이라도 있다면 한번 알아보라고 권하며 이렇게 덧붙였다.",
-    src: ["Instagram, 2025년 12월 · E! News 보도", "https://www.eonline.com/news/1426684/anthony-hopkins-50-years-sober-message-to-fans"],
-    focus: [.52, .31] },
-  { id: "downey", name: "Robert Downey Jr.", ko: "로버트 다우니 주니어", role: "배우 · 〈아이언맨〉", tint: "orange",
-    since: "2003-07", quote: "What's hard is to decide to do it.", line: "어려운 건, 하기로 결정하는 거예요.",
-    story: "1990년대 후반부터 체포와 수감, 재활원을 오가며 커리어가 거의 끝났었다. 2003년 7월에 멈췄고, 5년 뒤 〈아이언맨〉으로 돌아왔다. 2004년 오프라 윈프리 쇼에서, 끔찍해 보이는 문제를 이겨내는 일 자체는 생각만큼 어렵지 않다고 말했다.",
-    src: ["The Oprah Winfrey Show, 2004", "https://www.oprah.com/oprahshow/the-comeback-kid"],
-    focus: [.52, .37] },
-  { id: "jackson", name: "Samuel L. Jackson", ko: "새뮤얼 L. 잭슨", role: "배우 · 〈펄프 픽션〉", tint: "teal",
-    since: "1991", quote: "I didn't drink yesterday and I'm not planning on it today.", line: "어제 안 마셨고, 오늘도 마실 계획 없어요.",
-    story: "1991년, 아내와 딸이 부엌 바닥에 쓰러져 있는 그를 발견했다. 곧바로 재활원에 들어갔고, 나오자마자 〈정글 피버〉의 중독자 역으로 칸 영화제에서 연기상을 받았다. 그는 알코올 중독을 암처럼 언제든 다시 올 수 있는 병으로 여긴다. 그래서 목표는 늘 오늘 하루다.",
-    src: ["Men's Health 인터뷰 · Men's Journal 보도", "https://www.mensjournal.com/news/samuel-l-jackson-sobriety-career"],
-    focus: [.50, .39] },
-  { id: "washington", name: "Denzel Washington", ko: "덴젤 워싱턴", role: "배우 · 〈트레이닝 데이〉", tint: "red",
-    since: "2014-12", quote: "I stopped at 60, and I haven't had a thimble's worth since.", line: "예순에 끊었고, 그 뒤로 골무 한 잔만큼도 안 마셨어요.",
-    story: "한때 하루에 와인 두 병을 마셨다. 예순이 된 2014년 12월에 끊었다. 2024년 에스콰이어 인터뷰에서 몸에 많은 손상을 남겼다고 담담히 인정하면서, 그 뒤로는 한 방울도 입에 대지 않았다고 했다.",
-    src: ["Esquire, 2024 · Variety 보도", "https://variety.com/2024/film/news/denzel-washington-sober-10-years-body-damage-1236215451/"],
-    focus: [.47, .37] },
-  { id: "cooper", name: "Bradley Cooper", ko: "브래들리 쿠퍼", role: "배우·감독 · 〈스타 이즈 본〉", tint: "mint",
-    since: "2004", quote: "If I continued it, I was really going to sabotage my whole life.", line: "계속 그렇게 살았다면, 내 인생 전체를 망쳤을 거예요.",
-    story: "20대 후반, 술과 약물이 일과 관계를 망가뜨리고 있었다. 친구 윌 아넷의 직설적인 한마디를 계기로 2004년, 스물아홉에 끊었다. 14년 뒤 알코올 중독 뮤지션이 주인공인 〈스타 이즈 본〉을 직접 연출하고 연기했다.",
-    src: ["GQ, 2013 · Showbiz Cheat Sheet 보도", "https://www.cheatsheet.com/entertainment/bradley-cooper-embraced-sobriety-because-thought-sabotage-life.html/"],
-    focus: [.50, .35] },
-  { id: "hardy", name: "Tom Hardy", ko: "톰 하디", role: "배우 · 〈매드맥스: 분노의 도로〉", tint: "green",
-    since: "2003", quote: "Now I know my beast and I know how to manage it.", line: "이제 내 안의 짐승을 알고, 다루는 법도 알아요.",
-    story: "2003년, 스물다섯에 술과 약물에 빠져 런던 길바닥에 쓰러진 채 발견됐다. 부모의 도움으로 재활원에 들어갔고 그 뒤로 멈췄다. 사고로 죽거나 감옥에 가지 않은 게 운이었다고 말한다. 중독은 자기를 죽이려 드는 180킬로그램짜리 오랑우탄 같다고 했다.",
-    src: ["인터뷰 인용 · IMDb", "https://www.imdb.com/name/nm0362766/quotes/"],
-    focus: [.47, .42] },
-  { id: "farrell", name: "Colin Farrell", ko: "콜린 파렐", role: "배우 · 〈더 펭귄〉", tint: "yellow",
-    since: "2006", quote: "The sober world is pretty scary.", line: "그렇게 20년을 마시고 나면, 맨정신의 세상은 꽤 무서워요.",
-    story: "20대 내내 할리우드에서 가장 거칠게 마시는 배우로 유명했다. 2005년 말 재활원에 들어갔다. 엔젤만 증후군을 가진 큰아들 제임스의 아버지가 될 상태가 아니었다고 돌아본다. 그 무서운 맨정신의 세상에서 두 아들 곁을 지켰고, 〈이니셰린의 밴시〉로 아카데미 후보에 올랐다.",
-    src: ["The Irish Times", "https://www.irishtimes.com/culture/film/colin-farrell-after-20-years-of-drinking-the-way-i-drank-the-sober-world-is-pretty-scary-1.4501552"],
-    focus: [.50, .50] },
-  { id: "mcgregor", name: "Ewan McGregor", ko: "이완 맥그리거", role: "배우 · 〈트레인스포팅〉", tint: "blue",
-    since: "2000", quote: "So something had to go.", line: "그래서 뭔가 하나는 놓아야 했어요.",
-    story: "〈트레인스포팅〉으로 스타가 된 뒤 술이 점점 늘었다. 일, 가족, 그리고 술. 세 갈래의 삶을 한꺼번에 감당할 수 없었고, 2000년 무렵 하나를 놓았다. 술이었다. 지금은 금주가 매일의 일상이라고 말한다.",
-    src: ["Men's Journal", "https://www.mensjournal.com/entertainment/ewan-mcgregor-cover-story/"],
-    focus: [.52, .37] },
-  { id: "oldman", name: "Gary Oldman", ko: "게리 올드먼", role: "배우 · 〈다크 나이트〉", tint: "cyan",
-    since: "1997", quote: "There was a point when I didn't think I could've gone 28 seconds without a drink.", line: "술 없이 28초도 못 버틸 것 같던 때가 있었어요.",
-    story: "땀에서 보드카가 났다고 말할 만큼 마셨다. 1997년 무렵 끊었고, 그 뒤에 시리우스 블랙과 고든 경감을 연기했고 〈다키스트 아워〉로 아카데미 남우주연상을 받았다. 술을 끊지 않았다면 죽었거나 시설에 있었을 거라고 한다.",
-    src: ["People, 2025 · Yahoo 보도", "https://www.yahoo.com/entertainment/articles/gary-oldman-says-hed-either-204243463.html"],
-    focus: [.43, .43] },
-  { id: "radcliffe", name: "Daniel Radcliffe", ko: "대니얼 래드클리프", role: "배우 · 〈해리 포터〉", tint: "red",
-    since: "2013", approx: true, quote: "There's no shame in enjoying the quiet life.", line: "조용한 삶을 즐기는 건 부끄러운 게 아니에요.",
-    story: "해리 포터 막바지에 술에 크게 기대게 됐다. 전날 술이 덜 깬 채 촬영장에 간 날도 많았다고 털어놨다. 2010년 처음 끊은 뒤 한 번 더 무너졌다가 다시 멈췄다. 이제는 집에서 책을 읽거나 자기를 웃게 해주는 사람과 이야기하는 쪽이 좋다고 한다.",
-    src: ["인터뷰 · SheKnows 보도", "https://www.sheknows.com/entertainment/articles/835193/daniel-radcliffe-says-no-to-alcohol-and-yes-to-the-quiet-life/"],
-    focus: [.50, .47] },
-  { id: "holland", name: "Tom Holland", ko: "톰 홀랜드", role: "배우 · 〈스파이더맨〉", tint: "indigo",
-    since: "2022-01", quote: "You'll never wake up the morning after a night out and wish you had a drink.", line: "술자리 다음 날 아침, ‘어젯밤 마실 걸’ 하며 깨는 일은 절대 없어요.",
-    story: "2022년 1월, 한 달만 쉬어보자며 시작했다. 한 달 내내 술 생각만 하는 자신이 무서워서 6개월로 늘렸고, 그 6월에 인생에서 가장 행복했다고 한다. 가장 와닿았던 조언이 이 한 문장이었다. 2024년엔 무알코올 맥주 브랜드를 만들었다.",
-    src: ["On Purpose with Jay Shetty, 2023 · TODAY 보도", "https://www.today.com/health/tom-holland-talks-sobriety-knew-alcohol-problem-rcna93607"],
-    focus: [.50, .45] },
-  { id: "hathaway", name: "Anne Hathaway", ko: "앤 해서웨이", role: "배우 · 〈악마는 프라다를 입는다〉", tint: "teal",
-    since: "2018-10", quote: "My personal experience with it is that everything is better.", line: "제 경우엔, 모든 게 더 나아졌어요.",
-    story: "2018년 가을, 아들이 열여덟이 될 때까지 술을 끊겠다고 했다. 술은 자기에게 자기연민의 연료였다고 말한다. 2024년, 금주 5년을 넘긴 걸 처음 공개하며 이정표 같다고 했다.",
-    src: ["TODAY, 2024", "https://www.today.com/health/anne-hathaway-sober-rcna149971"],
-    focus: [.33, .45] },
-  { id: "curtis", name: "Jamie Lee Curtis", ko: "제이미 리 커티스", role: "배우 · 〈에브리씽 에브리웨어 올 앳 원스〉", tint: "pink",
-    since: "1999-02", quote: "Getting sober remains my single greatest accomplishment.", line: "술을 끊은 건 여전히 내 인생 최고의 성취예요.",
-    story: "수술 후 처방받은 진통제에서 시작된 중독을 10년 가까이 아무도 몰랐다. 1999년 2월 처음 회복 모임에 나간 날, 남편에게 털어놓았다. 금주는 남편보다, 두 아이보다, 어떤 성공이나 실패보다 큰 일이라고 말한다. 2023년엔 오스카를 받았다.",
-    src: ["People 인터뷰 · Fox News 보도", "https://www.foxnews.com/entertainment/jamie-lee-curtis-calls-22-year-sobriety-legacy-single-greatest-thing-i-do"],
-    focus: [.50, .45] },
-  { id: "brolin", name: "Josh Brolin", ko: "조시 브롤린", role: "배우 · 〈어벤져스〉 타노스", tint: "indigo",
-    since: "2013-11", quote: "…the most punk rock sobriety imaginable.", line: "상상할 수 있는 가장 펑크록한 금주.",
-    story: "스스로를 술 마시려고 태어난 사람이라 불렀다. 2013년 재활을 거쳐 멈췄고, 매년 금주 기념일마다 긴 글을 올린다. 8주년엔 새벽 6시 촬영장에 가는 트럭에서 아내가 남긴 고맙다는 카드를 발견한 이야기를 쓰고, 신과 가족과 친구들에게 감사를 전했다.",
-    src: ["Instagram, 2021 · Good Morning America 보도", "https://www.goodmorningamerica.com/culture/story/josh-brolin-marks-years-sobriety-poignant-instagram-post-80921942"],
-    focus: [.49, .37] },
-  { id: "lowe", name: "Rob Lowe", ko: "롭 로", role: "배우 · 〈웨스트 윙〉", tint: "cyan",
-    since: "1990-05-10", quote: "I found a sober life of true happiness and fulfillment.", line: "맨정신의 삶에서 진짜 행복과 충만함을 찾았어요.",
-    story: "1980년대 ‘브랫팩’의 한가운데 있었다. 1990년 5월 10일, 스물여섯에 이렇게는 못 살겠다는 생각이 들었고 48시간 뒤 재활원에 들어갔다. 금주 30주년에 이 문장을 남겼다. 이후 아들의 금주도 곁에서 도왔다.",
-    src: ["Instagram, 2020 · Variety 보도", "https://variety.com/2021/tv/news/rob-lowe-sobriety-recovery-1234899611/"],
-    focus: [.50, .43] },
-  { id: "eminem", name: "Eminem", ko: "에미넴", role: "래퍼 · 〈8 마일〉", tint: "indigo",
-    since: "2008-04-20", quote: "XVIII", roman: true, line: "18년 금주 코인 사진에 붙인 캡션. 이게 전부였다.",
-    story: "2007년 12월 과다복용으로 쓰러졌다. 의사들은 병원에 두 시간만 늦었어도 죽었을 거라고 했다. 2008년 4월 20일부터 멈췄다. 18주년이던 2026년 4월, 금주 코인을 든 사진을 올리며 캡션엔 로마 숫자 하나만 적었다.",
-    src: ["Instagram, 2026년 4월 · Rolling Stone 보도", "https://www.rollingstone.com/music/music-news/eminem-18-years-of-sobriety-1235547472/"],
-    focus: [.47, .40] },
-  { id: "elton", name: "Elton John", ko: "엘튼 존", role: "싱어송라이터 · 〈Rocket Man〉", tint: "purple",
-    since: "1990-07-29", quote: "Raising a 0% glass to life.", line: "인생을 위해, 0% 잔을 듭니다.",
-    story: "1980년대 내내 술과 코카인, 폭식증에 시달렸다. 1990년 7월 스스로 도움을 청해 재활원에 들어갔다. 30주년엔 그때 도움을 청하지 않았다면 죽었을 거라고 했다. 36주년인 2026년 7월엔 0% 스파클링 잔을 들어 올렸다.",
-    src: ["Instagram, 2026년 7월 · Attitude 보도", "https://www.attitude.co.uk/culture/elton-john-marks-36-years-of-sobriety-530204/"],
-    focus: [.48, .40] },
-  { id: "ringo", name: "Ringo Starr", ko: "링고 스타", role: "드러머 · 비틀스", tint: "purple",
-    since: "1988-10", quote: "When I got sober, I had all this time and more energy.", line: "술을 끊으니 시간이 이렇게 많아지고, 힘도 더 생겼어요.",
-    story: "비틀스 해체 뒤 오랫동안 매일 마셨다. 1988년 가을 아내 바버라 바크와 함께 애리조나의 재활원에 들어갔고, 그 뒤로 한 잔도 마시지 않았다. 자신도, 주변 누구도 존중하지 않고 있었기 때문이라고 한다. 나오자마자 올스타 밴드를 만들었다.",
-    src: ["Men's Fitness", "https://www.mensfitness.com/news/ringo-starr-sobriety"],
-    focus: [.45, .28] },
-  { id: "slash", name: "Slash", ko: "슬래시", role: "기타리스트 · 건즈 앤 로지스", tint: "purple",
-    since: "2006-07-03", quote: "I was fortunate. I didn't die, and I didn't go to prison.", line: "난 운이 좋았어요. 죽지도 않았고, 감옥에도 안 갔으니까.",
-    story: "건즈 앤 로지스 시절 술과 헤로인으로 여러 번 죽을 뻔했다. 2006년 7월 3일 새벽 재활원에 들어가 30일을 꽉 채웠고, 그 뒤로 멈췄다. 아이들의 첫 기억 속 아빠가 망가진 중독자이길 원치 않았다고 한다.",
-    src: ["Yahoo Entertainment", "https://www.yahoo.com/entertainment/slash-talks-addiction-recovery-fortunate-didnt-die-didnt-go-prison-142948931.html"],
-    focus: [.31, .19] },
-  { id: "alice", name: "Alice Cooper", ko: "앨리스 쿠퍼", role: "쇼크록 · 〈School's Out〉", tint: "blue",
-    since: "1983", quote: "You don't have to be drunk to be punk.", line: "펑크하려고 취할 필요는 없어요.",
-    story: "1970년대 쇼크록을 만든 사람. 술 때문에 몇 번이나 병원에 실려 갔고, 1983년 이후로 마시지 않는다. 무대 위 괴물 분장과 뱀과 단두대는 그대로다. 로큰롤은 태도일 뿐, 취해야 로커가 되는 건 아니라고 말한다.",
-    src: ["People 인터뷰 · alicecooper.com", "https://alicecooper.com/alice-cooper-says-rockstar-life-no-longer-means-drugs-backstage-except-bengay-advil-tylenol-people-exclusive/"],
-    focus: [.43, .31] },
-  { id: "florence", name: "Florence Welch", ko: "플로렌스 웰치", role: "싱어 · Florence + The Machine", tint: "pink",
-    since: "2014", quote: "To be conscious and to be present… feels like much more a truly reborn spirit of rock and roll.", line: "깨어 있는 채로, 지금 여기서 느끼는 것. 그게 진짜로 다시 태어난 로큰롤 같아요.",
-    story: "처음엔 가장 세게 달리지 못하면 로큰롤을 배신하는 거라고 믿었다. 2014년 무렵 술을 끊었고, 첫해엔 자기 자신의 큰 조각을 잃은 것 같았다고 한다. 지금은 아프더라도 깨어서 모든 걸 느끼는 쪽이 진짜 로큰롤이라고 말한다.",
-    src: ["The New Yorker Festival, 2019 · The New Yorker Radio Hour", "https://podcasts.apple.com/us/podcast/florence-welch-talks-about-life-on-the-road/id1050430296?i=1000661643419"],
-    focus: [.38, .32] },
-  { id: "king", name: "Stephen King", ko: "스티븐 킹", role: "소설가 · 〈샤이닝〉", tint: "orange",
-    since: "1987", quote: "I would trade writing for staying married and watching the kids grow up.", line: "글쓰기를 내주더라도, 결혼 생활과 아이들이 크는 걸 지키기로 했어요.",
-    story: "『쿠조』는 쓴 기억이 거의 없을 만큼 마셨다. 1987년, 아내 태비사가 가족과 친구들 앞에서 그의 쓰레기통을 쏟아 보였다. 술을 끊으면 글도 끝날 거라 두려웠지만, 그 뒤로 40권 넘는 책을 냈다.",
-    src: ["『유혹하는 글쓰기(On Writing)』 · The Sober Curator 정리", "https://thesobercurator.com/stephen-king-has-been-sober-for-almost-40-years/"],
-    focus: [.48, .46] },
-  { id: "matsushige", name: "Yutaka Matsushige", ko: "마츠시게 유타카", role: "배우 · 〈고독한 미식가〉", tint: "yellow",
-    since: "2018", approx: true, quote: "違う世界を\n見てみたかった", lang: "ja", line: "다른 세계를 한번 보고 싶었어요.",
-    story: "〈고독한 미식가〉의 고로 아저씨. 원래 술을 즐겼지만 50대 중반에 끊었다. 이유는 건강이 아니라, 다른 세계를 보고 싶어서였다고. 술을 못 마시는 고로와 점점 닮아가고 있다고 웃는다.",
-    src: ["일본 연예 매체 인터뷰 정리", "https://www.xn--u9jy52gkffn9q8qbux6ab4xi9c4wsx57a.com/matsushige-yutaka-geko"],
-    focus: [.48, .37] },
+  { id: "hopkins", name: "Anthony Hopkins", ko: "앤서니 홉킨스", role: "배우 · 〈양들의 침묵〉", tint: "red", since: "1975-12-29",
+    photos: [["hopkins", [.52, .31]], ["hopkins-2", [.50, .43]]],
+    quotes: [
+      { t: "It's all over. Now you can start living.", ko: "다 끝났다. 이제부터 살면 된다.", s: ["1975년 그날 들린 내면의 목소리 · Fox News, 2025", "https://www.foxnews.com/entertainment/anthony-hopkins-credits-divinity-life-force-instant-end-alcohol-cravings"] },
+      { t: "And it has all been for a purpose, so don't forget one moment of it.", ko: "그 모든 건 이유가 있었으니, 한순간도 잊지 마라.", s: ["Fox News, 2025", "https://www.foxnews.com/entertainment/anthony-hopkins-credits-divinity-life-force-instant-end-alcohol-cravings"] },
+      { t: "Because life is much better.", ko: "인생이 훨씬 낫거든요.", s: ["Instagram, 2025 · E! News 보도", "https://www.eonline.com/news/1426684/anthony-hopkins-50-years-sober-message-to-fans"] },
+      { t: "Choose life instead of the opposite.", ko: "그 반대 말고, 삶을 택하세요.", s: ["Instagram, 2025 · E! News 보도", "https://www.eonline.com/news/1426684/anthony-hopkins-50-years-sober-message-to-fans"] },
+    ],
+    story: "1975년 12월 29일, 블랙아웃 상태로 차를 몰다 누군가를, 혹은 자신을 죽일 수도 있었다는 걸 깨달았다. 그 순간 내면에서 강한 목소리가 들렸고, 그 뒤로 술 생각이 사라졌다고 한다. 금주 50년이 되던 2025년엔 인스타그램에 영상을 올려 술 문제가 있다면 한번 알아보라고 권했다." },
+
+  { id: "downey", name: "Robert Downey Jr.", ko: "로버트 다우니 주니어", role: "배우 · 〈아이언맨〉", tint: "orange", since: "2003-07",
+    photos: [["downey", [.52, .37]], ["downey-2", [.50, .34]], ["downey-3", [.43, .37]]],
+    quotes: [
+      { t: "What's hard is to decide to do it.", ko: "어려운 건, 하기로 결정하는 거예요.", s: ["The Oprah Winfrey Show, 2004", "https://www.oprah.com/oprahshow/the-comeback-kid"] },
+      { t: "It's not that difficult to overcome these seemingly ghastly problems.", ko: "끔찍해 보이는 문제도, 이겨내는 건 생각만큼 어렵지 않아요.", s: ["The Oprah Winfrey Show, 2004", "https://www.oprah.com/oprahshow/the-comeback-kid"] },
+      { t: "I reached out for help and I ran with it.", ko: "도움을 청했고, 그걸 붙잡고 달렸어요.", s: ["오프라 윈프리 인터뷰 · I Am Sober 정리", "https://iamsober.com/en/blog/robert-downey-jr-sober-story"] },
+      { t: "I don't drink these days. I am allergic to alcohol and narcotics. I break out in handcuffs.", ko: "요즘 술 안 마셔요. 술이랑 약에 알레르기가 있거든요. 먹으면 수갑이 돋아요.", s: ["인터뷰 인용 · AZ Quotes", "https://www.azquotes.com/author/4113-Robert_Downey_Jr/tag/addiction"] },
+    ],
+    story: "1990년대 후반부터 체포와 수감, 재활원을 오가며 커리어가 거의 끝났었다. 2003년 7월에 멈췄고, 5년 뒤 〈아이언맨〉으로 돌아왔다. 도움을 청한 순간부터 모든 게 시작됐다고 말한다." },
+
+  { id: "jackson", name: "Samuel L. Jackson", ko: "새뮤얼 L. 잭슨", role: "배우 · 〈펄프 픽션〉", tint: "teal", since: "1991",
+    photos: [["jackson", [.50, .39]], ["jackson-2", [.51, .35]], ["jackson-3", [.49, .33]]],
+    quotes: [
+      { t: "I didn't drink yesterday and I'm not planning on it today.", ko: "어제 안 마셨고, 오늘도 마실 계획 없어요.", s: ["Men's Health 인터뷰 · Men's Journal 보도", "https://www.mensjournal.com/news/samuel-l-jackson-sobriety-career"] },
+      { t: "I was a week out of rehab when I started doing Jungle Fever.", ko: "재활원 나온 지 일주일 만에 〈정글 피버〉를 찍기 시작했어요.", s: ["인터뷰 · I Am Sober 정리", "https://iamsober.com/en/blog/samuel-jackson"] },
+      { t: "For me, I have a direct correlation between getting sober and success.", ko: "저한테는 술을 끊은 것과 성공이 정확히 이어져 있어요.", s: ["인터뷰 · I Am Sober 정리", "https://iamsober.com/en/blog/samuel-jackson"] },
+      { t: "People treated for cancer might go into remission, but there's a chance it will come back. I feel the same about alcoholism.", ko: "암도 나은 것 같다가 다시 올 수 있잖아요. 알코올 중독도 똑같다고 생각해요.", s: ["Men's Health 인터뷰 · Men's Journal 보도", "https://www.mensjournal.com/news/samuel-l-jackson-sobriety-career"] },
+    ],
+    story: "1991년, 아내와 딸이 부엌 바닥에 쓰러져 있는 그를 발견했다. 곧바로 재활원에 들어갔고, 나오자마자 〈정글 피버〉의 중독자 역으로 칸 영화제에서 연기상을 받았다. 그는 알코올 중독을 언제든 다시 올 수 있는 병으로 여긴다. 그래서 목표는 늘 오늘 하루다." },
+
+  { id: "washington", name: "Denzel Washington", ko: "덴젤 워싱턴", role: "배우 · 〈트레이닝 데이〉", tint: "red", since: "2014-12",
+    photos: [["washington", [.47, .37]], ["washington-2", [.56, .35]], ["washington-3", [.47, .37]]],
+    quotes: [
+      { t: "I stopped at 60, and I haven't had a thimble's worth since.", ko: "예순에 끊었고, 그 뒤로 골무 한 잔만큼도 안 마셨어요.", s: ["Esquire, 2024 · Variety 보도", "https://variety.com/2024/film/news/denzel-washington-sober-10-years-body-damage-1236215451/"] },
+      { t: "If I order more, I'll drink more.", ko: "더 시키면, 더 마시니까요.", s: ["매일 와인 두 병만 주문하던 시절 · Esquire, 2024", "https://variety.com/2024/film/news/denzel-washington-sober-10-years-body-damage-1236215451/"] },
+      { t: "I've done a lot of damage to the body.", ko: "몸을 많이 망가뜨렸죠.", s: ["Esquire, 2024 · Variety 보도", "https://variety.com/2024/film/news/denzel-washington-sober-10-years-body-damage-1236215451/"] },
+    ],
+    story: "한때 매일 와인 두 병을 주문해 하루 동안 다 마셨다. 더 시키면 더 마실 걸 알아서 딱 두 병이었다고. 예순이 된 2014년 12월에 끊었고, 2024년 에스콰이어 인터뷰에서 몸에 남긴 손상을 담담히 인정했다." },
+
+  { id: "cooper", name: "Bradley Cooper", ko: "브래들리 쿠퍼", role: "배우·감독 · 〈스타 이즈 본〉", tint: "mint", since: "2004",
+    photos: [["cooper", [.50, .35]], ["cooper-2", [.48, .34]], ["cooper-3", [.47, .30]]],
+    quotes: [
+      { t: "If I continued it, I was really going to sabotage my whole life.", ko: "계속 그렇게 살았다면, 내 인생 전체를 망쳤을 거예요.", s: ["GQ, 2013 · Showbiz Cheat Sheet 보도", "https://www.cheatsheet.com/entertainment/bradley-cooper-embraced-sobriety-because-thought-sabotage-life.html/"] },
+      { t: "I was lucky. I got sober at 29 years old.", ko: "운이 좋았어요. 스물아홉에 술을 끊었으니까요.", s: ["Running Wild with Bear Grylls, 2023 · TODAY 보도", "https://www.today.com/popculture/bradley-cooper-sobriety-rcna100871"] },
+      { t: "It changed my entire life.", ko: "그 한마디가 제 인생 전체를 바꿨어요.", s: ["친구 윌 아넷과의 대화에 대해 · SmartLess, 2022", "https://www.aol.com/entertainment/bradley-cooper-quotes-sobriety-getting-001104994.html"] },
+    ],
+    story: "20대 후반, 술과 약물이 일과 관계를 망가뜨리고 있었다. 친구 윌 아넷의 직설적인 한마디를 계기로 2004년, 스물아홉에 끊었다. 14년 뒤 알코올 중독 뮤지션이 주인공인 〈스타 이즈 본〉을 직접 연출하고 연기했다." },
+
+  { id: "hardy", name: "Tom Hardy", ko: "톰 하디", role: "배우 · 〈매드맥스: 분노의 도로〉", tint: "green", since: "2003",
+    photos: [["hardy", [.47, .42]], ["hardy-2", [.36, .22]]],
+    quotes: [
+      { t: "Now I know my beast and I know how to manage it.", ko: "이제 내 안의 짐승을 알고, 다루는 법도 알아요.", s: ["인터뷰 인용 · IMDb", "https://www.imdb.com/name/nm0362766/quotes/"] },
+      { t: "I went entirely off the rails and I'm lucky I didn't have some terrible accident or end up in prison or dead.", ko: "완전히 궤도를 벗어났었어요. 끔찍한 사고를 내거나, 감옥에 가거나, 죽지 않은 게 운이죠.", s: ["인터뷰 인용 · IMDb", "https://www.imdb.com/name/nm0362766/quotes/"] },
+      { t: "It's like living with a 400 pound orangutan that wants to kill me.", ko: "나를 죽이고 싶어 하는 180킬로그램짜리 오랑우탄이랑 사는 것 같아요.", s: ["중독에 대해 · IMDb", "https://www.imdb.com/name/nm0362766/quotes/"] },
+    ],
+    story: "2003년, 스물다섯에 술과 약물에 빠져 런던 길바닥에 쓰러진 채 발견됐다. 부모의 도움으로 재활원에 들어갔고 그 뒤로 멈췄다. 중독은 사라지지 않지만, 이제는 그걸 다루는 법을 안다고 말한다." },
+
+  { id: "farrell", name: "Colin Farrell", ko: "콜린 파렐", role: "배우 · 〈더 펭귄〉", tint: "yellow", since: "2006",
+    photos: [["farrell", [.50, .50]], ["farrell-2", [.45, .24]], ["farrell-3", [.51, .35]]],
+    quotes: [
+      { t: "I have yet to meet a person whose sobriety has made their life worse.", ko: "술을 끊어서 인생이 나빠진 사람은 아직 한 명도 못 봤어요.", s: ["Irish Independent 인터뷰 · Yahoo 정리", "https://www.yahoo.com/entertainment/colin-farrell-returns-rehab-look-back-hes-said-addiction-224134118.html"] },
+      { t: "The sober world is pretty scary.", ko: "그렇게 20년을 마시고 나면, 맨정신의 세상은 꽤 무서워요.", s: ["The Irish Times", "https://www.irishtimes.com/culture/film/colin-farrell-after-20-years-of-drinking-the-way-i-drank-the-sober-world-is-pretty-scary-1.4501552"] },
+      { t: "To come home and not to have the buffer support of a few drinks… it was a really amazing thing.", ko: "술 몇 잔에 기대지 않고 집에 돌아오는 것. 그건 정말 놀라운 일이었어요.", s: ["The Irish Times", "https://www.irishtimes.com/culture/film/colin-farrell-after-20-years-of-drinking-the-way-i-drank-the-sober-world-is-pretty-scary-1.4501552"] },
+    ],
+    story: "20대 내내 할리우드에서 가장 거칠게 마시는 배우로 유명했다. 2005년 말 재활원에 들어갔다. 엔젤만 증후군을 가진 큰아들 제임스의 아버지가 될 상태가 아니었다고 돌아본다. 그 무서운 맨정신의 세상에서 두 아들 곁을 지켰고, 〈이니셰린의 밴시〉로 아카데미 후보에 올랐다." },
+
+  { id: "mcgregor", name: "Ewan McGregor", ko: "이완 맥그리거", role: "배우 · 〈트레인스포팅〉", tint: "blue", since: "2000",
+    photos: [["mcgregor", [.52, .37]], ["mcgregor-2", [.45, .35]], ["mcgregor-3", [.47, .37]]],
+    quotes: [
+      { t: "So something had to go.", ko: "그래서 뭔가 하나는 놓아야 했어요.", s: ["Men's Journal", "https://www.mensjournal.com/entertainment/ewan-mcgregor-cover-story/"] },
+      { t: "At the time, I thought it was cool… Actually, who I am isn't that.", ko: "그땐 그게 멋있는 줄 알았어요. 근데 진짜 나는 그런 사람이 아니었어요.", s: ["Men's Journal", "https://www.mensjournal.com/entertainment/ewan-mcgregor-cover-story/"] },
+      { t: "An everyday part of my life is being sober.", ko: "술을 안 마시는 건 제 매일의 일부예요.", s: ["The Irish Times, 2021", "https://www.irishtimes.com/culture/tv-radio-web/ewan-mcgregor-i-ve-been-sober-a-long-time-addiction-is-part-of-my-life-1.4561915"] },
+      { t: "Getting sober gave me joy, happiness and peace.", ko: "술을 끊고 기쁨과 행복, 평화를 얻었어요.", s: ["myTalk 107.1 보도", "https://www.mytalk1071.com/ewan-mcgregor-getting-sober-gave-me-joy-happiness-and-peace/"] },
+    ],
+    story: "〈트레인스포팅〉으로 스타가 된 뒤 술이 점점 늘었다. 일, 가족, 그리고 술. 세 갈래의 삶을 한꺼번에 감당할 수 없었고, 2000년 무렵 하나를 놓았다. 술이었다." },
+
+  { id: "oldman", name: "Gary Oldman", ko: "게리 올드먼", role: "배우 · 〈다크 나이트〉", tint: "cyan", since: "1997",
+    photos: [["oldman", [.43, .43]], ["oldman-2", [.54, .45]], ["oldman-3", [.45, .25]]],
+    quotes: [
+      { t: "There was a point when I didn't think I could've gone 28 seconds without a drink.", ko: "술 없이 28초도 못 버틸 것 같던 때가 있었어요.", s: ["People, 2025 · Yahoo 보도", "https://www.yahoo.com/entertainment/articles/gary-oldman-says-hed-either-204243463.html"] },
+      { t: "My personal life is immeasurably better from just not living in a fog.", ko: "안개 속에 살지 않는 것만으로, 삶이 비교할 수 없이 나아졌어요.", s: ["칸 영화제, 2024 · Philstar 보도", "https://www.philstar.com/entertainment/2024/05/26/2357877/gary-oldman-talks-sobriety-harry-potter-cannes"] },
+      { t: "I'm in a very good place at the moment, and a lot of that is to do with sobriety.", ko: "지금 아주 좋은 상태예요. 그 많은 부분이 술을 끊은 덕분이죠.", s: ["칸 영화제, 2024 · Philstar 보도", "https://www.philstar.com/entertainment/2024/05/26/2357877/gary-oldman-talks-sobriety-harry-potter-cannes"] },
+      { t: "I used to sweat vodka.", ko: "땀에서 보드카가 났었어요.", s: ["Good Morning America, 2021", "https://www.goodmorningamerica.com/culture/story/gary-oldman-reflects-24-years-sobriety-sweat-vodka-76224529"] },
+    ],
+    story: "땀에서 보드카가 났다고 말할 만큼 마셨다. 1997년 무렵 끊었고, 그 뒤에 시리우스 블랙과 고든 경감을 연기했고 〈다키스트 아워〉로 아카데미 남우주연상을 받았다. 술을 끊지 않았다면 죽었거나 시설에 있었을 거라고 한다." },
+
+  { id: "radcliffe", name: "Daniel Radcliffe", ko: "대니얼 래드클리프", role: "배우 · 〈해리 포터〉", tint: "red", since: "2013", approx: true,
+    photos: [["radcliffe", [.50, .47]], ["radcliffe-2", [.42, .37]], ["radcliffe-3", [.50, .33]]],
+    quotes: [
+      { t: "There's no shame in enjoying the quiet life.", ko: "조용한 삶을 즐기는 건 부끄러운 게 아니에요.", s: ["인터뷰 · SheKnows 보도", "https://www.sheknows.com/entertainment/articles/835193/daniel-radcliffe-says-no-to-alcohol-and-yes-to-the-quiet-life/"] },
+      { t: "I'm really much happier now.", ko: "지금이 훨씬 행복해요.", s: ["LADbible, 2025", "https://www.ladbible.com/entertainment/celebrity/daniel-radcliffe-sober-alcohol-drinking-733757-20250113"] },
+      { t: "I feel much more settled mentally. I'm more in tune with what makes me happy.", ko: "마음이 훨씬 안정됐어요. 뭐가 나를 행복하게 하는지 더 잘 알게 됐고요.", s: ["LADbible, 2025", "https://www.ladbible.com/entertainment/celebrity/daniel-radcliffe-sober-alcohol-drinking-733757-20250113"] },
+      { t: "I became so reliant on alcohol to enjoy stuff.", ko: "뭘 즐기려면 술에 기대야 하는 사람이 돼 있었어요.", s: ["E! News", "https://www.eonline.com/news/250528/daniel-radcliffe-reveals-battle-with-drinking-i-became-so-reliant-on-alcohol-to-enjoy-stuff"] },
+    ],
+    story: "해리 포터 막바지에 술에 크게 기대게 됐다. 전날 술이 덜 깬 채 촬영장에 간 날도 많았다고 털어놨다. 2010년 처음 끊은 뒤 한 번 더 무너졌다가 다시 멈췄다. 이제는 집에서 책을 읽거나 자기를 웃게 해주는 사람과 이야기하는 쪽이 좋다고 한다." },
+
+  { id: "holland", name: "Tom Holland", ko: "톰 홀랜드", role: "배우 · 〈스파이더맨〉", tint: "indigo", since: "2022-01",
+    photos: [["holland", [.50, .45]], ["holland-2", [.47, .14]]],
+    quotes: [
+      { t: "You'll never wake up the morning after a night out and wish you had a drink.", ko: "술자리 다음 날 아침, ‘어젯밤 마실 걸’ 하며 깨는 일은 절대 없어요.", s: ["가장 와닿았던 조언 · TODAY, 2023", "https://www.today.com/health/tom-holland-talks-sobriety-knew-alcohol-problem-rcna93607"] },
+      { t: "By the time I had got to June 1st, I was the happiest I've ever been in my life.", ko: "6월 1일이 됐을 때, 저는 인생에서 가장 행복했어요.", s: ["On Purpose with Jay Shetty, 2023 · The Hollywood Reporter", "https://www.hollywoodreporter.com/lifestyle/lifestyle-news/tom-holland-alcohol-addiction-sobriety-1235533302/"] },
+      { t: "Why am I enslaved to this drink?", ko: "나는 왜 이 술에 매여 있지?", s: ["On Purpose with Jay Shetty, 2023 · The Hollywood Reporter", "https://www.hollywoodreporter.com/lifestyle/lifestyle-news/tom-holland-alcohol-addiction-sobriety-1235533302/"] },
+      { t: "The best thing I've ever done.", ko: "제가 한 일 중에 최고예요.", s: ["Good Morning America, 2023", "https://www.goodmorningamerica.com/culture/story/tom-holland-opens-sobriety-journey-best-thing-101096317"] },
+    ],
+    story: "2022년 1월, 한 달만 쉬어보자며 시작했다. 한 달 내내 술 생각만 하는 자신이 무서워서 6개월로 늘렸고, 그 6월에 인생에서 가장 행복했다고 한다. 2024년엔 무알코올 맥주 브랜드를 만들었다." },
+
+  { id: "hathaway", name: "Anne Hathaway", ko: "앤 해서웨이", role: "배우 · 〈악마는 프라다를 입는다〉", tint: "teal", since: "2018-10",
+    photos: [["hathaway", [.33, .45]], ["hathaway-2", [.45, .34]], ["hathaway-3", [.37, .39]]],
+    quotes: [
+      { t: "My personal experience with it is that everything is better.", ko: "제 경우엔, 모든 게 더 나아졌어요.", s: ["TODAY, 2024", "https://www.today.com/health/anne-hathaway-sober-rcna149971"] },
+      { t: "I'm going to stop drinking while my son is living in my house.", ko: "아들이 우리 집에 사는 동안은 술을 끊을 거예요.", s: ["The Ellen Show, 2019 · TODAY 보도", "https://www.today.com/popculture/anne-hathaway-tells-ellen-she-s-quitting-drinking-next-18-t147154"] },
+      { t: "That feels like a milestone to me.", ko: "저한테는 이정표 같은 일이에요.", s: ["금주 5년을 넘기며 · TODAY, 2024", "https://www.today.com/health/anne-hathaway-sober-rcna149971"] },
+      { t: "It makes me unavailable for my son.", ko: "술은 아들 곁에 온전히 있지 못하게 해요.", s: ["Fox News", "https://www.foxnews.com/entertainment/anne-hathaway-drinking-son.amp"] },
+    ],
+    story: "2018년 가을, 숙취인 채로 아들을 등원시킨 날이 싫었다고 한다. 그래서 아들이 열여덟이 될 때까지 술을 끊겠다고 했다. 2024년, 금주 5년을 넘긴 걸 처음 공개했다." },
+
+  { id: "curtis", name: "Jamie Lee Curtis", ko: "제이미 리 커티스", role: "배우 · 〈에브리씽 에브리웨어 올 앳 원스〉", tint: "pink", since: "1999-02",
+    photos: [["curtis", [.50, .45]], ["curtis-2", [.47, .35]], ["curtis-3", [.60, .42]]],
+    quotes: [
+      { t: "Getting sober remains my single greatest accomplishment.", ko: "술을 끊은 건 여전히 내 인생 최고의 성취예요.", s: ["People 인터뷰 · Fox News 보도", "https://www.foxnews.com/entertainment/jamie-lee-curtis-calls-22-year-sobriety-legacy-single-greatest-thing-i-do"] },
+      { t: "Bigger than my husband, bigger than both of my children and bigger than any work, success, failure. Anything.", ko: "남편보다, 두 아이보다, 어떤 일이나 성공, 실패보다도 커요. 그 무엇보다도.", s: ["People 인터뷰 · Fox News 보도", "https://www.foxnews.com/entertainment/jamie-lee-curtis-calls-22-year-sobriety-legacy-single-greatest-thing-i-do"] },
+      { t: "I'm breaking the cycle that has basically destroyed the lives of generations in my family.", ko: "우리 집안 몇 대의 삶을 무너뜨린 그 고리를, 제가 끊고 있어요.", s: ["People 인터뷰 · Fox News 보도", "https://www.foxnews.com/entertainment/jamie-lee-curtis-calls-22-year-sobriety-legacy-single-greatest-thing-i-do"] },
+      { t: "My worst day was almost invisible to anyone else.", ko: "제 최악의 날은 다른 사람 눈엔 거의 보이지 않았어요.", s: ["AOL 보도", "https://www.aol.com/jamie-lee-curtis-opens-opioid-205440501.html"] },
+    ],
+    story: "수술 후 처방받은 진통제에서 시작된 중독을 10년 가까이 아무도 몰랐다. 1999년 2월 처음 회복 모임에 나간 날, 남편에게 털어놓았다. 2023년엔 오스카를 받았지만, 금주가 그보다 큰 일이라고 말한다." },
+
+  { id: "brolin", name: "Josh Brolin", ko: "조시 브롤린", role: "배우 · 〈어벤져스〉 타노스", tint: "indigo", since: "2013-11",
+    photos: [["brolin", [.49, .37]], ["brolin-2", [.50, .42]], ["brolin-3", [.54, .31]]],
+    quotes: [
+      { t: "…the most punk rock sobriety imaginable.", ko: "상상할 수 있는 가장 펑크록한 금주.", s: ["금주 8주년 Instagram, 2021 · Good Morning America 보도", "https://www.goodmorningamerica.com/culture/story/josh-brolin-marks-years-sobriety-poignant-instagram-post-80921942"] },
+      { t: "Sobriety is knowing the difference between selfishness and integrity.", ko: "금주란, 이기심과 진실함의 차이를 아는 것.", s: ["금주 8주년 Instagram, 2021 · Good Morning America 보도", "https://www.goodmorningamerica.com/culture/story/josh-brolin-marks-years-sobriety-poignant-instagram-post-80921942"] },
+      { t: "Sobriety is finally loving without every thought being about how it affects only you.", ko: "금주란, 모든 게 나한테 어떨지만 생각하지 않고 마침내 사랑하는 것.", s: ["금주 8주년 Instagram, 2021 · Good Morning America 보도", "https://www.goodmorningamerica.com/culture/story/josh-brolin-marks-years-sobriety-poignant-instagram-post-80921942"] },
+      { t: "…to put it down and to live instead.", ko: "내려놓고, 대신 살기로 한 것.", s: ["금주 8주년 Instagram, 2021 · Good Morning America 보도", "https://www.goodmorningamerica.com/culture/story/josh-brolin-marks-years-sobriety-poignant-instagram-post-80921942"] },
+    ],
+    story: "스스로를 술 마시려고 태어난 사람이라 불렀다. 2013년 재활을 거쳐 멈췄고, 매년 금주 기념일마다 긴 글을 올린다. 8주년엔 새벽 6시 촬영장에 가는 트럭에서 아내가 남긴 고맙다는 카드를 발견한 이야기를 썼다." },
+
+  { id: "lowe", name: "Rob Lowe", ko: "롭 로", role: "배우 · 〈웨스트 윙〉", tint: "cyan", since: "1990-05-10",
+    photos: [["lowe", [.50, .43]], ["lowe-2", [.50, .22]]],
+    quotes: [
+      { t: "I found a sober life of true happiness and fulfillment.", ko: "맨정신의 삶에서 진짜 행복과 충만함을 찾았어요.", s: ["금주 30주년 Instagram, 2020 · Variety 보도", "https://variety.com/2021/tv/news/rob-lowe-sobriety-recovery-1234899611/"] },
+      { t: "This is no way to live.", ko: "이렇게 살 수는 없어.", s: ["1990년 그날의 생각 · Fox News", "https://www.foxnews.com/entertainment/rob-lowe-brat-pack-alcoholism-battle-sobriety"] },
+      { t: "There is true, real hope.", ko: "진짜 희망이 있어요.", s: ["금주 25주년 · Now To Love 보도", "https://www.nowtolove.com.au/celebrity/celebrity-news/there-is-true-real-hope-rob-lowe-celebrates-25-years-of-sobriety-4718/"] },
+      { t: "I was super ready to coach Little League, carve pumpkins on Halloween, read books and serve hot lunch on Wednesdays.", ko: "리틀리그 코치도, 핼러윈 호박 조각도, 책 읽기도, 수요일 급식 봉사도 할 준비가 완전히 돼 있었어요.", s: ["People 인터뷰 · The Sober Curator 정리", "https://thesobercurator.com/rob-lowe-has-been-sober-since-1990/"] },
+    ],
+    story: "1980년대 ‘브랫팩’의 한가운데 있었다. 1990년 5월 10일, 스물여섯에 이렇게는 못 살겠다는 생각이 들었고 48시간 뒤 재활원에 들어갔다. 그 뒤 평범한 아빠의 일상을 사랑하게 됐고, 아들의 금주도 곁에서 도왔다." },
+
+  { id: "eminem", name: "Eminem", ko: "에미넴", role: "래퍼 · 〈8 마일〉", tint: "indigo", since: "2008-04-20",
+    photos: [["eminem", [.47, .40]], ["eminem-2", [.50, .30]]],
+    quotes: [
+      { t: "XVIII", roman: true, ko: "18년 금주 코인 사진에 붙인 캡션. 이게 전부였다.", s: ["Instagram, 2026년 4월 · Rolling Stone 보도", "https://www.rollingstone.com/music/music-news/eminem-18-years-of-sobriety-1235547472/"] },
+      { t: "I knew I had to change my life. I either get help, or I am going to die.", ko: "삶을 바꿔야 한다는 걸 알았어요. 도움을 받든지, 죽든지.", s: ["Rolling Stone, 2011", "https://www.rollingstone.com/music/music-news/eminem-on-the-road-back-from-hell-249093/"] },
+      { t: "Getting clean made me grow up.", ko: "끊고 나서야 어른이 됐어요.", s: ["Rolling Stone, 2011", "https://www.rollingstone.com/music/music-news/eminem-on-the-road-back-from-hell-249093/"] },
+      { t: "I feel like all the years that I was using, I wasn't growing as a person.", ko: "약에 빠져 있던 그 모든 해 동안, 저는 사람으로서 자라지 못했던 것 같아요.", s: ["Rolling Stone, 2011", "https://www.rollingstone.com/music/music-news/eminem-on-the-road-back-from-hell-249093/"] },
+    ],
+    story: "2007년 12월 과다복용으로 쓰러졌다. 의사들은 병원에 두 시간만 늦었어도 죽었을 거라고 했다. 2008년 4월 20일부터 멈췄다. 18주년이던 2026년 4월, 금주 코인을 든 사진을 올리며 캡션엔 로마 숫자 하나만 적었다." },
+
+  { id: "elton", name: "Elton John", ko: "엘튼 존", role: "싱어송라이터 · 〈Rocket Man〉", tint: "purple", since: "1990-07-29",
+    photos: [["elton", [.48, .40]], ["elton-2", [.50, .32]], ["elton-3", [.46, .37]]],
+    quotes: [
+      { t: "Raising a 0% glass to life.", ko: "인생을 위해, 0% 잔을 듭니다.", s: ["금주 36주년 Instagram, 2026 · Attitude 보도", "https://www.attitude.co.uk/culture/elton-john-marks-36-years-of-sobriety-530204/"] },
+      { t: "Grateful for every single day.", ko: "하루하루가 다 감사해요.", s: ["금주 36주년 Instagram, 2026 · Attitude 보도", "https://www.attitude.co.uk/culture/elton-john-marks-36-years-of-sobriety-530204/"] },
+      { t: "I finally summoned up the courage to say 3 words that would change my life: ‘I need help.’", ko: "마침내 용기를 내서, 인생을 바꿀 세 단어를 말했어요. ‘도와주세요.’", s: ["Instagram, 2019 · Parade 보도", "https://parade.com/living/quote-of-the-day-elton-john-courage-sobriety-i-need-help"] },
+      { t: "If I hadn't finally taken the big step of asking for help 30 years ago, I'd be dead.", ko: "30년 전 도움을 청하는 그 한 걸음을 내딛지 않았다면, 저는 죽었을 거예요.", s: ["Instagram, 2020 · CBS News 보도", "https://www.cbsnews.com/amp/news/elton-john-30-years-of-sobriety-says-he-would-be-dead-if-he-didnt-ask-for-help"] },
+      { t: "My soul was black, like a charred piece of steak, until I said, ‘I need help.’", ko: "‘도와주세요’라고 말하기 전까지, 제 영혼은 까맣게 탄 스테이크 같았어요.", s: ["인터뷰 · Freedom Institute 정리", "https://www.freedominstitute.org/news/i-need-help-elton-john-hero-of-hope"] },
+    ],
+    story: "1980년대 내내 술과 코카인, 폭식증에 시달렸다. 1990년 7월 스스로 도움을 청해 재활원에 들어갔다. 30주년엔 그때 도움을 청하지 않았다면 죽었을 거라고 했고, 36주년인 2026년 7월엔 0% 스파클링 잔을 들어 올렸다." },
+
+  { id: "ringo", name: "Ringo Starr", ko: "링고 스타", role: "드러머 · 비틀스", tint: "purple", since: "1988-10",
+    photos: [["ringo", [.45, .28]], ["ringo-2", [.32, .50]]],
+    quotes: [
+      { t: "When I got sober, I had all this time and more energy.", ko: "술을 끊으니 시간이 이렇게 많아지고, 힘도 더 생겼어요.", s: ["Men's Fitness", "https://www.mensfitness.com/news/ringo-starr-sobriety"] },
+      { t: "I came out, and I haven't had a drink since.", ko: "재활원에서 나왔고, 그 뒤로 한 잔도 안 마셨어요.", s: ["금주 37주년, 2025 · Soap Central 보도", "https://www.soapcentral.com/music/i-treating-anyone-around-respect-ringo-starr-says-marks-37-years-sober"] },
+      { t: "I live in the now.", ko: "저는 지금을 살아요.", s: ["Yahoo 보도", "https://www.yahoo.com/lifestyle/ringo-starr-loves-life-credits-234135429.html"] },
+      { t: "I love that life I'm allowed to live.", ko: "제가 살 수 있게 된 이 삶을 사랑해요.", s: ["Yahoo 보도", "https://www.yahoo.com/lifestyle/ringo-starr-loves-life-credits-234135429.html"] },
+      { t: "Peace and love.", ko: "피스 앤 러브.", s: ["그의 인사 · Parade", "https://parade.com/898450/jimfarber/ringo-starr-on-peace-love-sobriety-and-what-he-really-thought-of-yoko-plus-an-exclusive-video-revealing-his-secret-to-staying-upbeat/"] },
+    ],
+    story: "비틀스 해체 뒤 오랫동안 매일 마셨다. 1988년 가을 아내 바버라 바크와 함께 애리조나의 재활원에 들어갔고, 그 뒤로 한 잔도 마시지 않았다. 자신도, 주변 누구도 존중하지 않고 있었기 때문이라고 한다. 나오자마자 올스타 밴드를 만들었다." },
+
+  { id: "slash", name: "Slash", ko: "슬래시", role: "기타리스트 · 건즈 앤 로지스", tint: "purple", since: "2006-07-03",
+    photos: [["slash", [.31, .19]], ["slash-2", [.39, .15]], ["slash-3", [.43, .41]]],
+    quotes: [
+      { t: "I was fortunate. I didn't die, and I didn't go to prison.", ko: "난 운이 좋았어요. 죽지도 않았고, 감옥에도 안 갔으니까.", s: ["Yahoo Entertainment", "https://www.yahoo.com/entertainment/slash-talks-addiction-recovery-fortunate-didnt-die-didnt-go-prison-142948931.html"] },
+      { t: "You're always practicing sobriety for as long as you possibly can.", ko: "할 수 있는 한 오래, 계속 금주를 연습하는 거예요.", s: ["Yahoo Entertainment", "https://www.yahoo.com/entertainment/slash-talks-addiction-recovery-fortunate-didnt-die-didnt-go-prison-142948931.html"] },
+      { t: "I fully surrendered… And I've been sober ever since.", ko: "완전히 항복했어요. 그리고 그 뒤로 쭉 맨정신이에요.", s: ["금주 15주년 Instagram, 2021 · NME 보도", "https://www.nme.com/news/music/guns-n-roses-slash-celebrates-15-years-of-sobriety-proud-of-you-every-day-2985288"] },
+      { t: "You're going to have to prioritize staying clean over everything else.", ko: "무엇보다 깨끗하게 지내는 걸 우선에 둬야 해요.", s: ["동료 마크 모턴에게 한 조언 · Louder", "https://www.loudersound.com/news/mark-morton-slash-addiction-advice"] },
+    ],
+    story: "건즈 앤 로지스 시절 술과 헤로인으로 여러 번 죽을 뻔했다. 2006년 7월 3일 새벽 재활원에 들어가 30일을 꽉 채웠고, 그 뒤로 멈췄다. 아이들의 첫 기억 속 아빠가 망가진 중독자이길 원치 않았다고 한다." },
+
+  { id: "alice", name: "Alice Cooper", ko: "앨리스 쿠퍼", role: "쇼크록 · 〈School's Out〉", tint: "blue", since: "1983",
+    photos: [["alice", [.43, .31]], ["alice-2", [.43, .41]], ["alice-3", [.54, .20]]],
+    quotes: [
+      { t: "You don't have to be drunk to be punk.", ko: "펑크하려고 취할 필요는 없어요.", s: ["People 인터뷰 · alicecooper.com", "https://alicecooper.com/alice-cooper-says-rockstar-life-no-longer-means-drugs-backstage-except-bengay-advil-tylenol-people-exclusive/"] },
+      { t: "Rock ’n’ roll is more of an attitude.", ko: "로큰롤은 결국 태도예요.", s: ["People 인터뷰 · alicecooper.com", "https://alicecooper.com/alice-cooper-says-rockstar-life-no-longer-means-drugs-backstage-except-bengay-advil-tylenol-people-exclusive/"] },
+      { t: "When I came out I was totally healed from it. It was totally gone.", ko: "나왔을 땐 완전히 나아 있었어요. 싹 사라졌죠.", s: ["인터뷰 · Faithit 정리", "https://faithit.com/alice-cooper-stuns-doctor-credit-god-miraculous-sobriety/"] },
+      { t: "I never want to touch another drink.", ko: "다시는 술에 손대고 싶지 않아.", s: ["1983년 병원에 들어가던 마음 · Faithit 정리", "https://faithit.com/alice-cooper-stuns-doctor-credit-god-miraculous-sobriety/"] },
+    ],
+    story: "1970년대 쇼크록을 만든 사람. 술 때문에 몇 번이나 병원에 실려 갔고, 1983년 이후로 마시지 않는다. 무대 위 괴물 분장과 뱀과 단두대는 그대로다. 취해야 로커가 되는 건 아니라고 말한다." },
+
+  { id: "florence", name: "Florence Welch", ko: "플로렌스 웰치", role: "싱어 · Florence + The Machine", tint: "pink", since: "2014",
+    photos: [["florence", [.38, .32]]],
+    quotes: [
+      { t: "To be conscious and to be present… feels like much more a truly reborn spirit of rock and roll.", ko: "깨어 있는 채로, 지금 여기서 느끼는 것. 그게 진짜로 다시 태어난 로큰롤 같아요.", s: ["The New Yorker Festival, 2019 · The New Yorker Radio Hour", "https://podcasts.apple.com/us/podcast/florence-welch-talks-about-life-on-the-road/id1050430296?i=1000661643419"] },
+      { t: "If you couldn't go the hardest, you were letting rock and roll down.", ko: "가장 세게 달리지 못하면, 로큰롤을 실망시키는 거라고 믿었어요.", s: ["술을 끊기 전의 생각 · The New Yorker Radio Hour", "https://podcasts.apple.com/us/podcast/florence-welch-talks-about-life-on-the-road/id1050430296?i=1000661643419"] },
+      { t: "I felt like I'd really lost a big part of who I was.", ko: "제 자신의 큰 부분을 잃어버린 것 같았어요.", s: ["금주 첫해에 대해 · The New Yorker Radio Hour", "https://podcasts.apple.com/us/podcast/florence-welch-talks-about-life-on-the-road/id1050430296?i=1000661643419"] },
+      { t: "Please don't give up.", ko: "제발 포기하지 마세요.", s: ["금주 7주년 Instagram, 2021 · NME 보도", "https://www.nme.com/news/music/florence-welch-marks-seven-years-of-sobriety-please-dont-give-up-2872730"] },
+    ],
+    story: "처음엔 가장 세게 달리지 못하면 로큰롤을 배신하는 거라고 믿었다. 2014년 무렵 술을 끊었고, 첫해엔 자기 자신의 큰 조각을 잃은 것 같았다고 한다. 지금은 아프더라도 깨어서 모든 걸 느끼는 쪽이 진짜 로큰롤이라고 말한다." },
+
+  { id: "king", name: "Stephen King", ko: "스티븐 킹", role: "소설가 · 〈샤이닝〉", tint: "orange", since: "1987",
+    photos: [["king", [.48, .46]]],
+    quotes: [
+      { t: "I would trade writing for staying married and watching the kids grow up.", ko: "글쓰기를 내주더라도, 결혼 생활과 아이들이 크는 걸 지키기로 했어요.", s: ["『유혹하는 글쓰기(On Writing)』 · The Sober Curator 정리", "https://thesobercurator.com/stephen-king-has-been-sober-for-almost-40-years/"] },
+      { t: "Hemingway and Fitzgerald didn't drink because they were creative… They drank because it's what alkies are wired to do.", ko: "헤밍웨이와 피츠제럴드가 마신 건 창의적이어서가 아니에요. 알코올 중독자는 원래 그렇게 생겨먹었기 때문이죠.", s: ["『유혹하는 글쓰기(On Writing)』, 2000", "https://www.goodreads.com/quotes/1305004-hemingway-and-fitzgerald-didn-t-drink-because-they-were-creative-alienated"] },
+      { t: "The idea that creative endeavor and mind-altering substances are entwined is one of the great pop-intellectual myths of our time.", ko: "창작과 약물이 얽혀 있다는 생각은, 우리 시대의 대표적인 얄팍한 신화예요.", s: ["『유혹하는 글쓰기(On Writing)』, 2000", "https://en.wikipedia.org/wiki/On_Writing:_A_Memoir_of_the_Craft"] },
+      { t: "I was, after all, the guy who had written The Shining without even realizing that I was writing about myself.", ko: "알고 보니 나는 『샤이닝』을 쓰면서, 그게 내 이야기라는 것도 몰랐던 사람이었다.", s: ["『유혹하는 글쓰기(On Writing)』, 2000", "https://www.goodreads.com/quotes/1305004-hemingway-and-fitzgerald-didn-t-drink-because-they-were-creative-alienated"] },
+    ],
+    story: "『쿠조』는 쓴 기억이 거의 없을 만큼 마셨다. 1987년, 아내 태비사가 가족과 친구들 앞에서 그의 쓰레기통을 쏟아 보였다. 술을 끊으면 글도 끝날 거라 두려웠지만, 그 뒤로 40권 넘는 책을 냈다." },
+
+  { id: "matsushige", name: "Yutaka Matsushige", ko: "마츠시게 유타카", role: "배우 · 〈고독한 미식가〉", tint: "yellow", since: "2018", approx: true, lang: "ja",
+    photos: [["matsushige", [.48, .37]]],
+    quotes: [
+      { t: "違う世界を\n見てみたかった", ko: "다른 세계를 한번 보고 싶었어요.", s: ["술을 끊은 이유 · 일본 연예 매체 인터뷰 정리", "https://www.xn--u9jy52gkffn9q8qbux6ab4xi9c4wsx57a.com/matsushige-yutaka-geko"] },
+      { t: "これがないと生きていけないと思っていたものを取っ払ったときに、…今までとは違う自分が見えてくるんです", ko: "이게 없으면 못 산다고 생각했던 걸 걷어냈을 때, 지금까지와는 다른 내가 보여요.", s: ["일본 연예 매체 인터뷰 정리", "https://www.xn--u9jy52gkffn9q8qbux6ab4xi9c4wsx57a.com/matsushige-yutaka-geko"] },
+      { t: "案外すんなりやめられて、その分、甘いものを食べる時間がすごく大事になりました", ko: "생각보다 쉽게 끊었어요. 그만큼 단 걸 먹는 시간이 엄청 소중해졌죠.", s: ["인터뷰 · Berry&Moca 정리", "https://berrymoca.com/matusugeyutaka-sweets-alcohol/"] },
+      { t: "『今日、スイーツは何を食べようか？』ということに、今は異常に執着しています", ko: "‘오늘 디저트는 뭘 먹지?’에 지금은 이상할 정도로 집착하고 있어요.", s: ["인터뷰 · Berry&Moca 정리", "https://berrymoca.com/matusugeyutaka-sweets-alcohol/"] },
+    ],
+    story: "〈고독한 미식가〉의 고로 아저씨. 원래 술을 즐겼지만 50대 중반에 끊었다. 이유는 건강이 아니라, 다른 세계를 보고 싶어서였다고. 그 뒤로 디저트에 빠졌고, 술을 못 마시는 고로와 점점 닮아가고 있다고 웃는다." },
 ];
 
-/* 사진: Wikimedia Commons */
+/* 사진: Wikimedia Commons — [작가, 라이선스, 파일 페이지] */
 const CREDITS = {
-  hopkins: ["Omar David Sandoval Sida", "CC BY-SA 4.0", "File:Anthony_Hopkins_Red_Sea_Festival_2025_Portrait_(cropped).jpg"],
-  downey: ["PhilipRomano", "CC BY-SA 4.0", "File:RobertDowneyJr-byPhilipRomano7_(cropped).jpg"],
-  jackson: ["Daltoncitys", "CC BY-SA 4.0", "File:Samuel_L._Jackson_attending_the_World_premier_of_%22Argylle%22_in_London_,_January_2024_(cropped2).jpg"],
-  washington: ["Gabriel Hutchinson", "CC BY-SA 4.0", "File:Denzel_Washington_at_the_2025_Cannes_Film_Festival.jpg"],
-  cooper: ["Bryan Berlin", "CC BY-SA 4.0", "File:Bradley_Cooper_Is_This_Thing_On-41_(cropped).jpg"],
-  hardy: ["Gage Skidmore", "CC BY-SA 2.0", "File:Tom_Hardy_(41869508740)_(cropped).jpg"],
-  farrell: ["Quejaytee", "CC BY 4.0", "File:2025_Colin_Farrell_-_2_(cropped).jpg"],
-  mcgregor: ["Kevin Paul", "CC BY 4.0", "File:Ewan_McGregor_-_Los_Angeles_Comic_Con_2024.jpg"],
-  oldman: ["Gage Skidmore", "CC BY-SA 2.0", "File:Gary_Oldman_(13925515511)_(cropped).jpg"],
-  radcliffe: ["PhilipRomano", "CC BY-SA 4.0", "File:DanielRadcliffe-byPhilipRomano.jpg"],
-  holland: ["PhilipRomano", "CC BY-SA 4.0", "File:TomHolland-byPhilipRomano.jpg"],
-  hathaway: ["PhilipRomano", "CC BY-SA 4.0", "File:AnneHathaway-byPhilipRomano-Crop.jpg"],
-  curtis: ["Gabriel Hutchinson", "CC BY-SA 4.0", "File:2025_Jamie_Lee_Curtis_(cropped).jpg"],
-  brolin: ["Max Surprenant", "CC BY 4.0", "File:Josh_Brolin_TIFF_2025_(cropped).jpg"],
-  lowe: ["David Shankbone", "CC BY 3.0", "File:Rob_Lowe_2012_Shankbone_2.JPG"],
-  eminem: ["Brendan Linden", "CC0", "File:Eminem_2021_Color_Corrected.jpg"],
-  elton: ["Raph_PH", "CC BY 2.0", "File:EltonDocBFILFF101024_(4_of_17)_(cropped).jpg"],
-  ringo: ["dearMoon", "CC BY 3.0", "File:ARTIST_INTERVIEW_-_Ringo_Starr_(Former_the_Beatles)_exclusive_interview_0-14_screenshot_(portrait_crop).jpg"],
-  slash: ["Kreepin Deth", "CC BY-SA 4.0", "File:Slash_live_in_London_2022_(Cropped_-_upright).jpg"],
-  alice: ["Stefan Brending (2eight)", "CC BY-SA 3.0 DE", "File:2024_Alice_Cooper_-_by_2eight_-_9SC8435.jpg"],
-  florence: ["Raph_PH", "CC BY 2.0", "File:FlorenceRAHProms110924_(68_of_76)_(53989416201)_(cropped).jpg"],
-  king: ["Kevin Payravi", "CC BY-SA 4.0", "File:Stephen_King_at_the_2024_Toronto_International_Film_Festival_2_(cropped).jpg"],
-  matsushige: ["Dick Thomas Johnson", "CC BY 2.0", "File:Matsushige_Yutaka_from_%22The_Solitary_Gourmet%22_at_Red_Carpet_of_the_Tokyo_International_Film_Festival_2024_(54578101085).jpg"],
+  "hopkins": ["Omar David Sandoval Sida", "CC BY-SA 4.0", "File:Anthony_Hopkins_Red_Sea_Festival_2025_Portrait_(cropped).jpg"],
+  "downey": ["PhilipRomano", "CC BY-SA 4.0", "File:RobertDowneyJr-byPhilipRomano7_(cropped).jpg"],
+  "jackson": ["Daltoncitys", "CC BY-SA 4.0", "File:Samuel_L._Jackson_attending_the_World_premier_of_%22Argylle%22_in_London_,_January_2024_(cropped2).jpg"],
+  "washington": ["Gabriel Hutchinson", "CC BY-SA 4.0", "File:Denzel_Washington_at_the_2025_Cannes_Film_Festival.jpg"],
+  "cooper": ["Bryan Berlin", "CC BY-SA 4.0", "File:Bradley_Cooper_Is_This_Thing_On-41_(cropped).jpg"],
+  "hardy": ["Gage Skidmore", "CC BY-SA 2.0", "File:Tom_Hardy_(41869508740)_(cropped).jpg"],
+  "farrell": ["Quejaytee", "CC BY 4.0", "File:2025_Colin_Farrell_-_2_(cropped).jpg"],
+  "mcgregor": ["Kevin Paul", "CC BY 4.0", "File:Ewan_McGregor_-_Los_Angeles_Comic_Con_2024.jpg"],
+  "oldman": ["Gage Skidmore", "CC BY-SA 2.0", "File:Gary_Oldman_(13925515511)_(cropped).jpg"],
+  "radcliffe": ["PhilipRomano", "CC BY-SA 4.0", "File:DanielRadcliffe-byPhilipRomano.jpg"],
+  "holland": ["PhilipRomano", "CC BY-SA 4.0", "File:TomHolland-byPhilipRomano.jpg"],
+  "hathaway": ["PhilipRomano", "CC BY-SA 4.0", "File:AnneHathaway-byPhilipRomano-Crop.jpg"],
+  "curtis": ["Gabriel Hutchinson", "CC BY-SA 4.0", "File:2025_Jamie_Lee_Curtis_(cropped).jpg"],
+  "brolin": ["Max Surprenant", "CC BY 4.0", "File:Josh_Brolin_TIFF_2025_(cropped).jpg"],
+  "lowe": ["David Shankbone", "CC BY 3.0", "File:Rob_Lowe_2012_Shankbone_2.JPG"],
+  "eminem": ["Brendan Linden", "CC0", "File:Eminem_2021_Color_Corrected.jpg"],
+  "elton": ["Raph_PH", "CC BY 2.0", "File:EltonDocBFILFF101024_(4_of_17)_(cropped).jpg"],
+  "ringo": ["dearMoon", "CC BY 3.0", "File:ARTIST_INTERVIEW_-_Ringo_Starr_(Former_the_Beatles)_exclusive_interview_0-14_screenshot_(portrait_crop).jpg"],
+  "slash": ["Kreepin Deth", "CC BY-SA 4.0", "File:Slash_live_in_London_2022_(Cropped_-_upright).jpg"],
+  "alice": ["Stefan Brending (2eight)", "CC BY-SA 3.0 DE", "File:2024_Alice_Cooper_-_by_2eight_-_9SC8435.jpg"],
+  "florence": ["Raph_PH", "CC BY 2.0", "File:FlorenceRAHProms110924_(68_of_76)_(53989416201)_(cropped).jpg"],
+  "king": ["Kevin Payravi", "CC BY-SA 4.0", "File:Stephen_King_at_the_2024_Toronto_International_Film_Festival_2_(cropped).jpg"],
+  "matsushige": ["Dick Thomas Johnson", "CC BY 2.0", "File:Matsushige_Yutaka_from_%22The_Solitary_Gourmet%22_at_Red_Carpet_of_the_Tokyo_International_Film_Festival_2024_(54578101085).jpg"],
+  "downey-2": ["Gage Skidmore", "CC BY-SA 2.0", "File:Robert_Downey,_Jr._SDCC_2014_(cropped).jpg"],
+  "downey-3": ["Edgar Meritano", "CC BY-SA 3.0", "File:Robert_Downey_Jr-2008_cropped.JPG"],
+  "jackson-2": ["Philip Romano", "CC BY-SA 4.0", "File:SamuelLJackson.jpg"],
+  "jackson-3": ["Gage Skidmore", "CC BY-SA 3.0", "File:Samuel_L._Jackson_by_Gage_Skidmore_2.jpg"],
+  "washington-2": ["Adam Chitayat", "CC BY 4.0", "File:Denzel_Washington_in_2024.jpg"],
+  "washington-3": ["PhilipRomanoPhoto", "CC BY 4.0", "File:DenzelWashington-byPhilipRomano2bw.jpg"],
+  "cooper-2": ["Raph_PH", "CC BY 2.0", "File:Bradley_Cooper_2023_(cropped).jpg"],
+  "cooper-3": ["Carlos González Santos", "CC0", "File:Bradley_Cooper_(11242795155)_(cropped)_Brighter.jpg"],
+  "hardy-2": ["GabboT", "CC BY-SA 2.0", "File:The_Drop_33_(15067292027).jpg"],
+  "farrell-2": ["Raph_PH", "CC BY 2.0", "File:BansheesBFI131022_(21_of_22)_(52447275762)_(cropped).jpg"],
+  "farrell-3": ["Gage Skidmore", "CC BY-SA 3.0", "File:Colin_Farrell_by_Gage_Skidmore.jpg"],
+  "mcgregor-2": ["Philip Romano", "CC BY-SA 4.0", "File:EwanMcGregor2023.jpg"],
+  "mcgregor-3": ["Michael Vlasaty", "CC BY 2.0", "File:Ewan_McGregor_The_Men_Who_Stare_at_Goats_cropped.jpg"],
+  "oldman-2": ["John Bauld", "CC BY 2.0", "File:Gary_Oldman_in_2017_(36334517524).jpg"],
+  "oldman-3": ["GabboT", "CC BY-SA 2.0", "File:Gary_Oldman_2019_TIFF.jpg"],
+  "radcliffe-2": ["Gage Skidmore", "CC BY-SA 2.5", "File:Daniel_Radcliffe_(19740428165).jpg"],
+  "radcliffe-3": ["Gage Skidmore", "CC BY-SA 2.0", "File:Daniel_Radcliffe_SDCC_2014.jpg"],
+  "holland-2": ["ChristopherJClarke", "CC BY-SA 4.0", "File:Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg"],
+  "hathaway-2": ["Harald Krichel", "CC BY-SA 3.0", "File:Anne_Hathaway-68408_(cropped).jpg"],
+  "hathaway-3": ["Harald Krichel", "CC BY-SA 3.0", "File:Anne_Hathaway-68211_(cropped_2).jpg"],
+  "curtis-2": ["Gage Skidmore", "CC BY-SA 2.0", "File:Jamie_Lee_Curtis_(41851191720)_(cropped).jpg"],
+  "curtis-3": ["Gage Skidmore", "CC BY-SA 3.0", "File:Jamie_Lee_Curtis_by_Gage_Skidmore_4.jpg"],
+  "brolin-2": ["Gage Skidmore", "CC BY-SA 2.0", "File:Josh_Brolin_SDCC_2014.jpg"],
+  "brolin-3": ["Gage Skidmore", "CC BY-SA 2.0", "File:Josh_Brolin_2_SDCC_2014_(cropped).jpg"],
+  "lowe-2": ["dodge challenger1", "CC BY 2.0", "File:Rob_Lowe_cropped.jpg"],
+  "eminem-2": ["DoD News Features", "Public domain", "File:Eminem_-_Concert_for_Valor_in_Washington,_D.C._Nov._11,_2014_(2)_(cropped).jpg"],
+  "elton-2": ["Raph_PH", "CC BY 2.0", "File:Elton_John_2023.jpg"],
+  "elton-3": ["David Shankbone", "CC BY 3.0", "File:Elton_John_2011_Shankbone_4.JPG"],
+  "ringo-2": ["Microsoft Corporation", "CC BY-SA 4.0", "File:Xbox_E3_2009_Beatles_Rock_Band_(4).jpg"],
+  "slash-2": ["Raph_PH", "CC BY 2.0", "File:Slash,_Guitarist_of_Guns_N%27_Roses_in_2017.jpg"],
+  "slash-3": ["AxeAdam20", "CC0", "File:GNR_Belgrade_2025_03.jpg"],
+  "alice-2": ["Harald Krichel", "CC BY-SA 4.0", "File:Alice_Cooper-6477.jpg"],
+  "alice-3": ["Sven Mandel", "CC BY-SA 4.0", "File:Alice_Cooper_-_2019254212136_2019-09-11_Alice_Cooper_-_0142_-_B70I0143.jpg"],
+  "hopkins-2": ["Elena Torre", "CC BY-SA 2.0", "File:Anthony_Hopkins-Tuscan_Sun_Festival.jpg"],
 };
 
 /* ──────────────────────────────────────────────────────────── */
@@ -468,7 +612,7 @@ const $ = (id) => document.getElementById(id);
 const stage = $("stage"), deck = $("deck"), root = document.documentElement;
 const BY_ID = Object.fromEntries(PEOPLE.map(p => [p.id, p]));
 const YOU_TINT = "pink";
-const PHOTO_V = "2";   // sw.js의 CACHE 버전과 맞춰서 올리기
+const PHOTO_V = "3";   // sw.js의 CACHE 버전과 맞춰서 올리기
 const CHEVRON_UP = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l4-4 4 4"/></svg>';
 
 const store = {
@@ -496,27 +640,34 @@ function elapsed(from, to = new Date()) {
   const a = dayStart(from), b = dayStart(to);
   let years = b.getFullYear() - a.getFullYear();
   if (b.getMonth() < a.getMonth() || (b.getMonth() === a.getMonth() && b.getDate() < a.getDate())) years--;
-  let months = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
-  if (b.getDate() < a.getDate()) months--;
   const days = Math.round((b - a) / 864e5);
-  return { years: Math.max(0, years), months: Math.max(0, months), days: Math.max(0, days) };
+  return { years: Math.max(0, years), days: Math.max(0, days) };
 }
 
-function tally(e) {
-  if (e.years >= 1) return [e.years, "년"];
-  if (e.months >= 1) return [e.months, "개월"];
-  return [e.days, "일"];
-}
-
-function sinceLong(s, approx) {
+function sinceLong(s) {
   if (s.prec === "day") return `${s.y}년 ${s.m}월 ${s.d}일부터 금주 중`;
   if (s.prec === "month") return `${s.y}년 ${s.m}월부터 금주 중`;
-  return `${s.y}년${approx ? " 무렵" : ""}부터 금주 중`;
+  return `${s.y}년부터 금주 중`;
 }
 function sinceShort(s, approx) {
   if (s.prec === "day") return `${s.y}. ${s.m}. ${s.d}`;
   if (s.prec === "month") return `${s.y}. ${s.m}`;
   return `${s.y}${approx ? " 무렵" : ""}`;
+}
+
+/* ── variety: a different line and photo each time someone comes around ── */
+const SEEN_KEY = "aa.lastSeen";
+let lastSeen = {};
+try { lastSeen = JSON.parse(store.get(SEEN_KEY) || "{}") || {}; } catch (e) { lastSeen = {}; }
+function pickOther(n, last) {
+  if (n <= 1) return 0;
+  let i;
+  do { i = Math.floor(Math.random() * n); } while (i === last);
+  return i;
+}
+function remember(id, qi, pi) {
+  lastSeen[id] = [qi, pi];
+  store.set(SEEN_KEY, JSON.stringify(lastSeen));
 }
 
 /* ── my own date ─────────────────────────── */
@@ -547,10 +698,11 @@ function milestone(d) {
 function dayLabel(n) { return n >= 365 && n % 365 === 0 ? `${n / 365}년` : `${n.toLocaleString("ko-KR")}일`; }
 
 /* ── cards ───────────────────────────────── */
-function quoteClass(p) {
-  if (p.roman) return "quote roman";
-  const n = p.quote.length;
-  return n > 72 ? "quote xl" : n > 44 ? "quote l" : "quote";
+function quoteClass(q, lang) {
+  if (q.roman) return "quote roman";
+  const n = q.t.length;
+  if (lang === "ja") return n > 40 ? "quote xl" : n > 16 ? "quote l" : "quote m";
+  return n > 110 ? "quote xl" : n > 72 ? "quote l" : n > 40 ? "quote m" : "quote";
 }
 
 function buildYou() {
@@ -582,29 +734,29 @@ function buildYou() {
 
 function buildCard(id) {
   if (id === "you") return buildYou();
-  const p = BY_ID[id], s = parseSince(p.since), [n, unit] = tally(elapsed(s.date));
-  const lang = p.lang || "en";
+  const p = BY_ID[id], lang = p.lang || "en", seen = lastSeen[id] || [];
+  const qi = pickOther(p.quotes.length, seen[0]), pi = pickOther(p.photos.length, seen[1]);
+  const q = p.quotes[qi], [file, focus] = p.photos[pi];
   const card = document.createElement("article");
   card.className = "card";
   card.style.cssText = tintVars(p.tint);
   card.innerHTML = `
-    <div class="wash" style="background-image:url(photos/wash/${id}.jpg?v=${PHOTO_V})"></div>
-    <div class="photo"><div class="kb"><img alt="${esc(p.name)}" decoding="async"></div></div>
+    <div class="wash" style="background-image:url(photos/wash/${file}.jpg?v=${PHOTO_V})"></div>
+    <div class="photo"><div class="kb"><img alt="${esc(p.name)}" decoding="async" draggable="false"></div></div>
     <div class="top-shade"></div>
     <div class="copy">
-      <div class="tally"><span class="num">${n}</span><span class="unit">${unit}</span></div>
-      <div class="since">${sinceLong(s, p.approx)}</div>
-      <blockquote class="${quoteClass(p)}" lang="${lang}">${(p.roman || lang === "ja" ? esc(p.quote) : "“" + esc(p.quote) + "”").replace(/\n/g, "<br>")}</blockquote>
-      <p class="ko" lang="ko">${esc(p.line)}</p>
+      <div>${q.roman ? "" : '<span class="qmark" aria-hidden="true">“</span>'}
+        <blockquote class="${quoteClass(q, lang)}" lang="${lang}">${esc(q.t).replace(/\n/g, "<br>")}</blockquote></div>
+      <p class="ko" lang="ko">${esc(q.ko)}</p>
       <div class="byline"><div class="who"><span class="name">${esc(p.name)}</span><span class="role">${esc(p.ko)} · ${esc(p.role)}</span></div>
         <button class="more glass" type="button" data-story>이야기 ${CHEVRON_UP}</button></div>
     </div>`;
-  card._focus = p.focus;
+  card._qi = qi; card._pi = pi; card._focus = focus;
   const img = card.querySelector("img");
   card._ready = new Promise(res => {
     img.onload = () => { place(card); res(); };
     img.onerror = () => { img.remove(); res(); };
-    img.src = `photos/${id}.jpg?v=${PHOTO_V}`;
+    img.src = `photos/${file}.jpg?v=${PHOTO_V}`;
     if (img.complete && img.naturalWidth) { place(card); res(); }
   });
   return card;
@@ -613,42 +765,25 @@ function buildCard(id) {
 function place(card) {
   const img = card.querySelector("img");
   if (!img || !img.naturalWidth) return;
-  // The photo covers the full width and at least the top 72% of the screen;
-  // below that it fades into its own blurred wash, where the text sits.
-  const cw = stage.clientWidth, ch = stage.clientHeight, H = 0.72;
+  // The photo covers the full width and at least the top 70% of the screen;
+  // below that it fades into its own blurred wash, where the words sit.
+  const cw = stage.clientWidth, ch = stage.clientHeight, H = 0.70;
   const [fx, fy] = card._focus;
   const s = Math.max(cw / img.naturalWidth, (ch * H) / img.naturalHeight) * 1.03;
   const w = img.naturalWidth * s, h = img.naturalHeight * s;
   const x = Math.min(0, Math.max(cw - w, cw / 2 - fx * w));
-  const y = Math.min(0, Math.max(ch * H - h, ch * 0.32 - fy * h));
+  const y = Math.min(0, Math.max(ch * H - h, ch * 0.30 - fy * h));
   img.style.width = w + "px";
   img.style.height = h + "px";
   img.style.transform = `translate3d(${x}px, ${y}px, 0)`;
   card.querySelector(".kb").style.transformOrigin = `${x + fx * w}px ${y + fy * h}px`;
 }
 
-let current = null;
-function show(id) {
-  const card = buildCard(id);
-  card.dataset.id = id;
-  deck.appendChild(card);
-  current = id;
-  applyTint(id === "you" ? YOU_TINT : BY_ID[id].tint);
-  const reveal = () => {
-    if (!card.isConnected) return;
-    void card.offsetWidth; // commit the hidden state so the fade runs
-    card.classList.add("in");
-    setTimeout(() => {
-      [...deck.children].forEach(c => { if (c !== card && c.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING) c.remove(); });
-    }, 900);
-  };
-  Promise.race([card._ready, new Promise(r => setTimeout(r, 900))]).then(reveal);
-}
-
 /* ── deck order: shuffle bag, no repeats until everyone is seen ── */
 let bag = [];
 const history = [];
 let pos = -1;
+let current = null;
 
 function roster() {
   const list = PEOPLE.map(p => p.id);
@@ -666,35 +801,100 @@ function draw() {
   if (!bag.length) refill();
   return bag.pop();
 }
-function preloadAhead() {
-  if (bag.length < 2) {
-    const rest = bag.slice();
-    refill();
-    bag = bag.filter(id => !rest.includes(id)).concat(rest);
+function peekId(dir) {
+  if (dir > 0) {
+    if (pos >= history.length - 1) history.push(draw());
+    return history[pos + 1];
   }
-  bag.slice(-2).forEach(id => { if (id !== "you") { const im = new Image(); im.src = `photos/${id}.jpg?v=${PHOTO_V}`; } });
+  return pos > 0 ? history[pos - 1] : null;
+}
+function preloadAhead() {
+  const id = peekId(1);
+  const p = BY_ID[id];
+  if (p) p.photos.forEach(([f]) => { const im = new Image(); im.src = `photos/${f}.jpg?v=${PHOTO_V}`; });
 }
 
-function next() {
-  if (pos < history.length - 1) pos++;
-  else { history.push(draw()); pos = history.length - 1; }
-  show(history[pos]);
-  preloadAhead();
-  dismissHint();
+/* ── carousel ────────────────────────────── */
+let cur = null;        // the card on screen
+let neighbor = null;   // { dir, el, id } — the card being dragged in
+let busy = false;
+const W = () => stage.clientWidth;
+
+function mount(id) {
+  const el = buildCard(id);
+  el.dataset.id = id;
+  deck.appendChild(el);
+  return el;
 }
-function prev() {
-  if (pos <= 0) return;
-  pos--;
-  show(history[pos]);
+function setCurrent(el, id) {
+  cur = el; current = id;
+  el.classList.add("live");
+  if (id !== "you") remember(id, el._qi, el._pi);
+  applyTint(id === "you" ? YOU_TINT : BY_ID[id].tint);
+}
+function ensureNeighbor(dir) {
+  if (neighbor && neighbor.dir === dir) return neighbor;
+  dropNeighbor();
+  const id = peekId(dir);
+  if (!id) return null;
+  const el = mount(id);
+  el.style.transform = `translate3d(${dir * W()}px, 0, 0)`;
+  neighbor = { dir, el, id };
+  return neighbor;
+}
+function dropNeighbor() { if (neighbor) { neighbor.el.remove(); neighbor = null; } }
+function setOffset(dx) {
+  cur.style.transform = `translate3d(${dx}px, 0, 0)`;
+  if (neighbor) neighbor.el.style.transform = `translate3d(${neighbor.dir * W() + dx}px, 0, 0)`;
+}
+
+function settle(commit, ms = 340) {
+  commit = commit && !!neighbor;
+  busy = true;
+  const els = [cur, neighbor && neighbor.el].filter(Boolean);
+  els.forEach(el => { el.style.transition = `transform ${ms}ms cubic-bezier(.2, .8, .2, 1)`; void el.offsetWidth; });
+  setOffset(commit ? -neighbor.dir * W() : 0);
+  setTimeout(() => {
+    els.forEach(el => { el.style.transition = ""; });
+    if (commit) {
+      const n = neighbor;
+      neighbor = null;
+      cur.remove();
+      n.el.style.transform = "";
+      pos += n.dir;
+      setCurrent(n.el, n.id);
+      preloadAhead();
+      dismissHint();
+    } else {
+      dropNeighbor();
+      cur.style.transform = "";
+    }
+    busy = false;
+  }, ms + 20);
+}
+
+function go(dir) {
+  if (busy || openSheet) return;
+  if (!ensureNeighbor(dir)) return;
+  settle(true, 420);
+}
+
+function start() {
+  history.push(draw());
+  pos = 0;
+  const el = mount(history[0]);
+  el.classList.add("enter");
+  setCurrent(el, history[0]);
+  preloadAhead();
 }
 
 /* ── hint (first run only) ───────────────── */
-const HINT_KEY = "aa.seenHint";
+const HINT_KEY = "aa.seenSwipeHint";
 let hintTimer;
 function showHint() {
   if (store.get(HINT_KEY)) return;
   $("hint").classList.remove("gone");
-  hintTimer = setTimeout(dismissHint, 5000);
+  hintTimer = setTimeout(dismissHint, 6000);
 }
 function dismissHint() {
   clearTimeout(hintTimer);
@@ -724,21 +924,33 @@ function close() {
   stage.focus({ preventScroll: true });
 }
 
+function quoteText(q, lang) {
+  if (q.roman) return q.t;
+  const t = q.t.replace(/\n/g, "");
+  return lang === "ja" ? `「${t}」` : `“${t}”`;
+}
+
 function openStory() {
   if (current === "you") return openMine();
   const p = BY_ID[current];
-  if (!p) return;
-  const s = parseSince(p.since), e = elapsed(s.date), cr = CREDITS[p.id];
+  if (!p || !cur) return;
+  const s = parseSince(p.since), e = elapsed(s.date), lang = p.lang || "en";
   $("s-name").textContent = p.name;
   $("s-sub").textContent = `${p.ko} · ${p.role}`;
   $("s-since").textContent = sinceShort(s, p.approx);
   if (s.prec === "year") { $("s-count-label").textContent = "지난 해"; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
   else { $("s-count-label").textContent = "지난 날"; $("s-count").textContent = (s.prec === "month" ? "약 " : "") + e.days.toLocaleString("ko-KR") + "일"; }
   $("s-story").textContent = p.story;
-  const q = $("s-quote");
-  q.lang = p.lang || "en";
-  q.textContent = p.roman || p.lang === "ja" ? p.quote.replace(/\n/g, "") : `“${p.quote}”`;
-  $("s-src").innerHTML = `${esc(p.src[0])} · <a href="${esc(p.src[1])}" target="_blank" rel="noopener">원문 기사</a>`;
+  const order = [cur._qi, ...p.quotes.map((_, i) => i).filter(i => i !== cur._qi)];
+  $("s-quotes").innerHTML = order.map((i, k) => {
+    const q = p.quotes[i];
+    return `<figure class="orig${k === 0 ? " now" : ""}">
+      <blockquote lang="${lang}">${esc(quoteText(q, lang))}</blockquote>
+      <p lang="ko">${esc(q.ko)}</p>
+      <figcaption>${esc(q.s[0])} · <a href="${esc(q.s[1])}" target="_blank" rel="noopener">원문</a></figcaption>
+    </figure>`;
+  }).join("");
+  const file = p.photos[cur._pi][0], cr = CREDITS[file];
   $("s-credit").innerHTML = cr
     ? `사진 · ${esc(cr[0])} · ${esc(cr[1])} · <a href="https://commons.wikimedia.org/wiki/${cr[2]}" target="_blank" rel="noopener">Wikimedia Commons</a>`
     : "";
@@ -758,20 +970,31 @@ function openMine() {
 $("my-save").addEventListener("click", () => {
   const v = $("my-start").value;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
-  const had = !!myStart();
   store.set(MY_KEY, v);
   renderMe();
-  if (!had && !bag.includes("you")) bag.splice(Math.floor(Math.random() * (bag.length + 1)), 0, "you");
+  if (!bag.includes("you")) bag.splice(Math.floor(Math.random() * (bag.length + 1)), 0, "you");
   close();
-  show("you");
-  history.splice(pos + 1, 0, "you"); pos++;
+  if (current === "you") {            // redraw my own card in place
+    const el = mount("you");
+    cur.remove();
+    setCurrent(el, "you");
+    return;
+  }
+  dropNeighbor();
+  history.splice(pos + 1, 0, "you");
+  setTimeout(() => go(1), 60);
 });
 $("my-clear").addEventListener("click", () => {
   store.set(MY_KEY, null);
   bag = bag.filter(id => id !== "you");
   renderMe();
   close();
-  if (current === "you") next();
+  dropNeighbor();
+  // take my card out of the history so swiping back never lands on it
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i] === "you" && i !== pos) { history.splice(i, 1); if (i < pos) pos--; }
+  }
+  if (current === "you") { history.splice(pos + 1, 0, draw()); go(1); setTimeout(() => { history.splice(pos - 1, 1); pos--; }, 500); }
 });
 
 document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", close));
@@ -785,21 +1008,44 @@ document.querySelectorAll(".sheet").forEach(sh => {
   sh.addEventListener("touchend", e => { if (y0 != null && e.changedTouches[0].clientY - y0 > 70) close(); y0 = null; });
 });
 
-/* ── stage gestures ──────────────────────── */
-let start = null;
+/* ── stage gestures: drag sideways to change person, drag up for the story; taps do nothing ── */
+let drag = null;
 stage.addEventListener("pointerdown", e => {
-  if (e.target.closest("button, a, input")) { start = null; return; }
-  start = { x: e.clientX, y: e.clientY };
+  if (busy || openSheet || e.button > 0 || e.target.closest("button, a, input")) return;
+  const now = performance.now();
+  drag = { x0: e.clientX, y0: e.clientY, dx: 0, dy: 0, axis: null, lastX: e.clientX, lastT: now, vx: 0 };
+  try { stage.setPointerCapture(e.pointerId); } catch (err) {}
 });
-stage.addEventListener("pointerup", e => {
-  if (!start) return;
-  const dx = e.clientX - start.x, dy = e.clientY - start.y;
-  start = null;
-  if (Math.abs(dy) > 48 && Math.abs(dy) > Math.abs(dx)) { if (dy < 0) openStory(); return; }
-  if (Math.abs(dx) > 48) { dx < 0 ? next() : prev(); return; }
-  if (Math.abs(dx) < 12 && Math.abs(dy) < 12) next();
+stage.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+  if (!drag.axis) {
+    if (Math.hypot(dx, dy) < 8) return;
+    drag.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+    if (drag.axis === "x") stage.classList.add("dragging");
+  }
+  if (drag.axis === "y") { drag.dy = dy; return; }
+  const now = performance.now();
+  drag.vx = (e.clientX - drag.lastX) / Math.max(1, now - drag.lastT);
+  drag.lastX = e.clientX; drag.lastT = now;
+  const n = ensureNeighbor(dx < 0 ? 1 : -1);
+  drag.dx = n ? dx : dx * 0.25;       // rubber band before the first card
+  setOffset(drag.dx);
 });
-stage.addEventListener("pointercancel", () => { start = null; });
+function endDrag() {
+  if (!drag) return;
+  const d = drag;
+  drag = null;
+  stage.classList.remove("dragging");
+  if (d.axis === "y") { if (d.dy < -50) openStory(); return; }
+  if (d.axis !== "x") return;         // a plain tap: stay on this person
+  const dir = neighbor ? neighbor.dir : 0;
+  const far = Math.abs(d.dx) > W() * 0.22;
+  const flick = Math.abs(d.dx) > 40 && Math.abs(d.vx) > 0.5 && Math.sign(d.vx) === -dir;
+  settle(dir !== 0 && Math.sign(d.dx) === -dir && (far || flick));
+}
+stage.addEventListener("pointerup", endDrag);
+stage.addEventListener("pointercancel", () => { if (drag) { drag = null; stage.classList.remove("dragging"); settle(false); } });
 stage.addEventListener("click", e => {
   if (e.target.closest("[data-story]")) openStory();
   else if (e.target.closest("[data-mine]")) openMine();
@@ -809,8 +1055,8 @@ stage.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") { close(); return; }
   if (openSheet || e.target.closest("input, button, a")) return;
-  if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") { e.preventDefault(); next(); }
-  else if (e.key === "ArrowLeft") prev();
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(1); }
+  else if (e.key === "ArrowLeft") go(-1);
   else if (e.key === "ArrowUp") { e.preventDefault(); openStory(); }
 });
 
@@ -820,7 +1066,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) rend
 
 /* ── go ──────────────────────────────────── */
 renderMe();
-next();
+start();
 showHint();
 
 // Offline cache for the home-screen app (skipped where there is no manifest)

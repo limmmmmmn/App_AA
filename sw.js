@@ -1,6 +1,9 @@
-// Bump CACHE when photos or icons change so phones pick up the new files.
-const CACHE = "aa-v2";   // index.html의 PHOTO_V와 맞춰서 올리기
-const V = "?v=2";
+// Bump CACHE and V together with PHOTO_V in index.html when photos or icons change,
+// so installed phones fetch the new files.
+const CACHE = "aa-v3";
+const V = "?v=3";
+// Each person's first photo is stored up front so the app opens offline;
+// the extra photos are saved the first time they appear.
 const IDS = [
   "alice", "brolin", "cooper", "curtis", "downey", "elton", "eminem", "farrell",
   "florence", "hardy", "hathaway", "holland", "hopkins", "jackson", "king", "lowe",
@@ -39,6 +42,6 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  // Photos, icons, fonts: cache first.
+  // Photos and icons: cache first.
   e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => put(req, res))));
 });
