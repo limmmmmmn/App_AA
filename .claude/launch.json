@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "aa-preview",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["C:/Users/ultla/AppData/Local/Temp/claude/C--Users-ultla-OneDrive-Desktop-App-AA/07c10112-ca6d-43d6-a23f-d6c044cdf1d5/scratchpad/serve.py", "8765"],
+      "port": 8765
+    }
+  ]
+}
