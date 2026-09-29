@@ -106,6 +106,7 @@ a { color: var(--tint-text); text-decoration: none; }
 .quote.xl { font-size: 20.5px; line-height: 1.27; letter-spacing: -.02em; }
 .quote.roman { font: 800 72px/1 var(--f-round); letter-spacing: .01em; }
 .quote:lang(ja) { font-family: var(--f-ja); font-weight: 700; letter-spacing: .02em; line-height: 1.45; }
+.quote:lang(ko), .orig blockquote:lang(ko) { word-break: keep-all; letter-spacing: -.035em; }
 .ko { margin: 0; font: 400 17px/1.5 var(--f-text); letter-spacing: -.012em; color: var(--label-2); word-break: keep-all; text-wrap: pretty; }
 
 .byline { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding-top: 14px; border-top: .5px solid var(--sep); }
@@ -118,6 +119,20 @@ a { color: var(--tint-text); text-decoration: none; }
 }
 .more svg { width: 12px; height: 12px; }
 .more:active, .pill:active { transform: scale(.96); }
+
+/* someone with no free photo: their tint as a soft field, their initials as a watermark */
+.nophoto .wash {
+  inset: 0; filter: none;
+  background:
+    radial-gradient(70% 50% at 22% 20%, color-mix(in oklab, var(--tint) 75%, transparent), transparent 70%),
+    radial-gradient(60% 45% at 85% 42%, color-mix(in oklab, var(--tint) 45%, #5e5ce6 25%), transparent 70%),
+    #0b0b0d;
+}
+.initial {
+  position: absolute; left: 0; right: 0; top: 16%; text-align: center;
+  font: 800 clamp(120px, 44vw, 210px)/1 var(--f-round); letter-spacing: -.04em;
+  color: rgba(255, 255, 255, .12); pointer-events: none;
+}
 
 /* the viewer's own card */
 .tally { display: flex; align-items: baseline; gap: 4px; }
@@ -544,6 +559,135 @@ const PEOPLE = [
       { t: "『今日、スイーツは何を食べようか？』ということに、今は異常に執着しています", ko: "‘오늘 디저트는 뭘 먹지?’에 지금은 이상할 정도로 집착하고 있어요.", s: ["인터뷰 · Berry&Moca 정리", "https://berrymoca.com/matusugeyutaka-sweets-alcohol/"] },
     ],
     story: "〈고독한 미식가〉의 고로 아저씨. 원래 술을 즐겼지만 50대 중반에 끊었다. 이유는 건강이 아니라, 다른 세계를 보고 싶어서였다고. 그 뒤로 디저트에 빠졌고, 술을 못 마시는 고로와 점점 닮아가고 있다고 웃는다." },
+
+  /* ── writers, broadcasters, history ── */
+  { id: "tolstoy", name: "Leo Tolstoy", ko: "레프 톨스토이", role: "소설가 · 『전쟁과 평화』", tint: "green", since: "1887", approx: true, died: "1910-11-20",
+    photos: [["tolstoy", [.57, .31]], ["tolstoy-2", [.48, .24]]],
+    quotes: [
+      { t: "Emancipation from this terrible evil will be an epoch in the life of humanity.", ko: "이 끔찍한 악에서 벗어나는 날은, 인류의 삶에 한 시대를 여는 날이 될 것이다.", s: ["「사람들은 왜 스스로를 마비시키는가」, 1890 · 모드 부부 번역", "https://www.marxists.org/archive/tolstoy/1890/why-do-men-stupefy-themselves/chapter-6.html"] },
+      { t: "They will begin to order their lives in accord with their perceptions.", ko: "사람들은 자기가 깨달은 대로 삶을 꾸려 가기 시작할 것이다.", s: ["술에서 깨어난 사람들에 대해 · 「사람들은 왜 스스로를 마비시키는가」, 1890", "https://www.marxists.org/archive/tolstoy/1890/why-do-men-stupefy-themselves/chapter-6.html"] },
+      { t: "The confusion, and above all the imbecility, of our lives, arises chiefly from the constant state of intoxication.", ko: "우리 삶의 혼란, 무엇보다 그 어리석음은 대개 늘 취해 있는 상태에서 나온다.", s: ["「사람들은 왜 스스로를 마비시키는가」, 1890", "https://www.marxists.org/archive/tolstoy/1890/why-do-men-stupefy-themselves/chapter-6.html"] },
+    ],
+    story: "『전쟁과 평화』와 『안나 카레니나』를 쓴 러시아의 대문호. 젊은 시절엔 술과 도박에 빠져 살았다. 50대 후반에 술과 담배를 끊고 금주 모임 ‘음주 반대 연합’을 만들었다. 1890년엔 사람들이 왜 술로 스스로를 마비시키는지 묻는 에세이를 썼다. 양심의 목소리를 덮으려고 마신다는 게 그의 답이었다." },
+
+  { id: "carver", name: "Raymond Carver", ko: "레이먼드 카버", role: "소설가 · 『대성당』", tint: "blue", since: "1977-06-02", died: "1988-08-02",
+    photos: [],
+    quotes: [
+      { t: "If you want the truth, I'm prouder of that, that I've quit drinking, than I am of anything in my life.", ko: "솔직히 말하면, 술을 끊은 게 내 인생 어떤 일보다 자랑스러워요.", s: ["The Paris Review, 1983", "https://www.theparisreview.org/authors/5272/raymond-carver"] },
+      { t: "June second, 1977.", ko: "언제 술을 끊었느냐는 질문에, 그는 날짜로만 답했다.", s: ["The Paris Review, 1983", "https://www.theparisreview.org/authors/5272/raymond-carver"] },
+      { t: "I'll always be an alcoholic, but I'm no longer a practicing alcoholic.", ko: "나는 평생 알코올 중독자일 거예요. 다만 더는 마시는 알코올 중독자가 아닐 뿐.", s: ["The Paris Review, 1983", "https://www.theparisreview.org/authors/5272/raymond-carver"] },
+    ],
+    story: "『대성당』과 「사소하지만 도움이 되는」을 쓴 미국 단편소설의 거장. 1970년대 중반까지 술 때문에 경찰서와 응급실, 법정을 오갔다. 1977년 6월 2일 마지막 잔을 내려놓았고, 1988년 세상을 떠날 때까지 11년을 맑은 정신으로 살았다. 대표작 대부분이 그 11년 동안 나왔다." },
+
+  { id: "lamott", name: "Anne Lamott", ko: "앤 라모트", role: "작가 · 『쓰기의 감각』", tint: "pink", since: "1986-07-07",
+    photos: [["lamott", [.50, .25]]],
+    quotes: [
+      { t: "Being sober delivered almost everything drinking promised.", ko: "술이 약속했던 거의 모든 걸, 술을 끊은 삶이 가져다줬어요.", s: ["Goodreads 인용", "https://www.goodreads.com/quotes/9588741-being-sober-delivered-almost-everything-drinking-promised"] },
+      { t: "37 years ago today, on July 7, 1986, I got clean and sober.", ko: "37년 전 오늘, 1986년 7월 7일, 저는 술과 약을 끊었어요.", s: ["금주 기념일 Facebook, 2023", "https://www.facebook.com/AnneLamott/posts/37-years-ago-today-on-july-7-1986-i-got-clean-and-sober-it-is-the-great-miracle-/813233463498495/"] },
+    ],
+    story: "『쓰기의 감각』으로 한국에도 잘 알려진 미국 작가. 서른둘이던 1986년 7월 7일, 술과 약을 끊었다. 스스로 조절할 수 없다는 걸 인정하는 데만 1년이 더 걸렸다고 한다. 그 뒤로 매년 7월 7일이면 금주 기념일을 공개적으로 축하한다." },
+
+  { id: "billw", name: "Bill W.", ko: "빌 윌슨", role: "AA(익명의 알코올 중독자들) 공동 창립자", tint: "indigo", since: "1934-12-11", died: "1971-01-24",
+    photos: [["billw", [.50, .30]]],
+    quotes: [
+      { t: "Simple, but not easy; a price had to be paid.", ko: "간단하지만 쉽지는 않았다. 대가를 치러야 했다.", s: ["『Alcoholics Anonymous』(빅북), 1939 · 1장 「빌의 이야기」", "https://www.aa.org/sites/default/files/2021-11/en_bigbook_chapt1.pdf"] },
+      { t: "I felt lifted up, as though the great clean wind of a mountain top blew through and through.", ko: "산꼭대기의 크고 맑은 바람이 온몸을 관통해 부는 것처럼, 들어 올려지는 느낌이었다.", s: ["『Alcoholics Anonymous』(빅북), 1939 · 1장 「빌의 이야기」", "https://www.aa.org/sites/default/files/2021-11/en_bigbook_chapt1.pdf"] },
+      { t: "There was a sense of victory, followed by such a peace and serenity as I had never known.", ko: "승리감이 들었고, 이어서 한 번도 느껴 보지 못한 평화와 고요가 찾아왔다.", s: ["『Alcoholics Anonymous』(빅북), 1939 · 1장 「빌의 이야기」", "https://www.aa.org/sites/default/files/2021-11/en_bigbook_chapt1.pdf"] },
+    ],
+    story: "뉴욕의 주식 중개인이었다. 술로 모든 걸 잃어 가던 1934년 12월 11일, 마지막 잔을 마시고 병원에 들어갔다. 이듬해 의사 밥 스미스를 만나 서로의 금주를 도우며 AA를 만들었다. 알코올 중독자가 다른 알코올 중독자를 돕는 이 방식은 지금 전 세계로 퍼져 있다. 1971년 세상을 떠날 때까지 다시 마시지 않았다." },
+
+  { id: "bford", name: "Betty Ford", ko: "베티 포드", role: "전 미국 영부인 · 베티 포드 센터 설립자", tint: "orange", since: "1978-04", died: "2011-07-08",
+    photos: [["bford", [.50, .22]]],
+    quotes: [
+      { t: "My makeup wasn't smeared, I wasn't disheveled, I behaved politely, and I never finished off a bottle, so how could I be alcoholic?", ko: "화장이 번진 것도 흐트러진 것도 아니었고, 예의 바르게 굴었고, 병을 다 비운 적도 없었어요. 그런 내가 어떻게 알코올 중독자겠어요?", s: ["『Betty: A Glad Awakening』, 1987 · Psychology Today 정리", "https://www.psychologytoday.com/us/blog/life-in-the-recovery-room/201109/betty-ford-a-hero-remembered-during-recovery-month"] },
+      { t: "I liked alcohol. It made me feel warm.", ko: "저는 술이 좋았어요. 몸이 따뜻해졌거든요.", s: ["『Betty: A Glad Awakening』, 1987", "https://www.psychologytoday.com/us/blog/life-in-the-recovery-room/201109/betty-ford-a-hero-remembered-during-recovery-month"] },
+      { t: "Today I am a very grateful recovering alcoholic and I know firsthand that treatment does work.", ko: "저는 오늘, 아주 감사하는 회복 중인 알코올 중독자예요. 치료가 효과 있다는 걸 직접 알아요.", s: ["인터뷰 인용 · BrainyQuote", "https://www.brainyquote.com/authors/betty-ford-quotes"] },
+    ],
+    story: "제럴드 포드 대통령의 부인. 백악관을 나온 이듬해인 1978년 4월, 가족들이 모여 그녀에게 맞섰다. 처음엔 화를 냈지만 곧 치료를 받았고, 술과 진통제 중독을 공개적으로 밝혔다. 영부인의 고백은 중독을 숨겨야 할 일에서 치료할 병으로 바꿔 놓았다. 1982년엔 베티 포드 센터를 세웠다." },
+
+  { id: "aldrin", name: "Buzz Aldrin", ko: "버즈 올드린", role: "우주비행사 · 아폴로 11호", tint: "cyan", since: "1978-10",
+    photos: [["aldrin", [.48, .30]], ["aldrin-2", [.50, .35]], ["aldrin-3", [.30, .35]]],
+    quotes: [
+      { t: "I have many frailties and shortcomings, but I am now a far more productive person than I ever was at the peak of my astronaut career.", ko: "저는 약점도 부족한 점도 많아요. 그래도 지금이 우주비행사로 정점에 있던 때보다 훨씬 생산적인 사람이에요.", s: ["Mobilize Recovery 정리", "https://www.mobilizerecovery.org/buzz_aldrin_from_the_moon_to_recovery"] },
+      { t: "If your mind is all clouded because of booze, you can't do that. So first things first.", ko: "술 때문에 머리가 흐려져 있으면 아무것도 할 수 없어요. 그러니 먼저 할 일부터.", s: ["The Fix, 2015", "https://www.thefix.com/buzz-aldrin-who-37-years-sober-reflects-family-history-mental-illness/"] },
+      { t: "I've got 37 years of sobriety, but I'm still seeing a shrink.", ko: "금주 37년째지만, 아직도 상담을 받아요.", s: ["The Fix, 2015", "https://www.thefix.com/buzz-aldrin-who-37-years-sober-reflects-family-history-mental-illness/"] },
+    ],
+    story: "1969년, 닐 암스트롱에 이어 두 번째로 달 위를 걸었다. 지구로 돌아온 뒤 우울증과 술에 무너졌다. 달을 보고 했던 말 ‘장엄한 황량함’이 곧 자기 마음 같았다고 한다. 1978년 10월 술을 끊었고, 그 뒤로 마시지 않았다." },
+
+  { id: "bush", name: "George W. Bush", ko: "조지 W. 부시", role: "제43대 미국 대통령", tint: "blue", since: "1986-07",
+    photos: [["bush", [.45, .31]], ["bush-2", [.50, .25]]],
+    quotes: [
+      { t: "I quit drinking in 1986 and haven't had a drop since then.", ko: "1986년에 술을 끊었고, 그 뒤로 한 방울도 안 마셨어요.", s: ["2000년 대선 캠페인 · Wikipedia", "https://en.wikipedia.org/wiki/Early_life_of_George_W._Bush"] },
+    ],
+    story: "마흔 번째 생일 파티 다음 날인 1986년 7월, 지독한 숙취 속에 달리기를 하다가 술을 끊기로 했다. 그 전해 빌리 그레이엄 목사를 만난 뒤 성경 공부를 시작한 것도 계기였다고 한다. 14년 뒤 대통령이 됐고, 회고록 『결정의 순간들』은 술을 끊은 그날 이야기로 시작한다." },
+
+  { id: "ferguson", name: "Craig Ferguson", ko: "크레이그 퍼거슨", role: "방송인 · 〈레이트 레이트 쇼〉 진행자", tint: "green", since: "1992-02-18",
+    photos: [["ferguson", [.39, .33]], ["ferguson-2", [.50, .26]]],
+    quotes: [
+      { t: "I nearly missed the whole show.", ko: "하마터면 이 쇼 전체를 놓칠 뻔했어요.", s: ["금주 31주년 X(트위터), 2023", "https://x.com/CraigyFerg/status/1626936922302971906"] },
+      { t: "I'm 25 years sober and anyone who knew me back then would tell you how impossible that is. Thanks for the miracle.", ko: "금주 25년째예요. 그 시절 저를 알던 사람이라면 그게 얼마나 불가능한 일인지 말해 줄 거예요. 기적을 고마워요.", s: ["금주 25주년 트위터, 2017 · Evening Times 보도", "https://www.eveningtimes.co.uk/news/15103331.scots-tv-star-craig-ferguson-marks-25-years-sober/"] },
+    ],
+    story: "스코틀랜드 출신 코미디언이자 미국 CBS 심야 토크쇼 〈레이트 레이트 쇼〉의 진행자. 1992년 2월 18일, 먼저 술을 끊은 친구에게 전화해 도움을 청했고 그 길로 재활원에 갔다. 진행자 시절엔 오프닝 전체를 자신의 알코올 중독 이야기에 쓰기도 했다." },
+
+  { id: "maron", name: "Marc Maron", ko: "마크 마론", role: "코미디언·팟캐스터 · 〈WTF〉", tint: "yellow", since: "1999-08-09",
+    photos: [["maron", [.39, .37]], ["maron-2", [.47, .22]]],
+    quotes: [
+      { t: "It's not a struggle or a fight or hard. It just is.", ko: "이젠 싸움도 아니고, 힘든 일도 아니에요. 그냥 그런 거예요.", s: ["WTF 블로그 〈Nineteen Years〉, 2018", "http://www.wtfpod.com/dispatches/nineteen-years"] },
+      { t: "I'm amazed and happy and grateful to be sober but it is something I just am now.", ko: "술을 끊었다는 게 놀랍고 행복하고 감사해요. 그런데 이제 그건 그냥 저 자체예요.", s: ["WTF 블로그 〈Nineteen Years〉, 2018", "http://www.wtfpod.com/dispatches/nineteen-years"] },
+      { t: "I was sort of in and out for years.", ko: "몇 년 동안 끊었다 마셨다를 반복했어요.", s: ["NPR 〈Fresh Air〉, 2016", "https://www.npr.org/2016/05/24/479312227/marc-maron-on-sobriety-and-managing-his-uncomfortable-comfort-zone"] },
+    ],
+    story: "미국 코미디언이자, 오바마 대통령까지 인터뷰한 팟캐스트 〈WTF〉의 진행자. 술과 약을 끊었다 다시 하기를 여러 해 반복했다. 1999년 8월 9일부터 멈췄다. 이제 금주는 싸움이 아니라 그냥 자기 자신이라고 말한다." },
+
+  { id: "delaney", name: "Rob Delaney", ko: "롭 딜레이니", role: "코미디언·작가 · 〈데드풀 2〉", tint: "teal", since: "2002-02",
+    photos: [["delaney", [.50, .36]]],
+    quotes: [
+      { t: "Twenty years ago I was in jail in a wheelchair and now I'm on a couch, with a lovely quilt, and my life is unrecognizable.", ko: "20년 전 저는 휠체어를 탄 채 유치장에 있었어요. 지금은 예쁜 퀼트 이불을 덮고 소파에 앉아 있고, 삶은 몰라볼 만큼 달라졌어요.", s: ["금주 20주년 영상, 2022 · Irish News 보도", "https://www.irishnews.com/magazine/entertainment/2022/02/04/news/rob-delaney-reflects-on-his-unrecognisable-life-after-20-years-of-sobriety-2580426/"] },
+      { t: "I'm shocked and overwhelmed and grateful.", ko: "놀랍고, 벅차고, 감사해요.", s: ["금주 20주년 영상, 2022 · Irish News 보도", "https://www.irishnews.com/magazine/entertainment/2022/02/04/news/rob-delaney-reflects-on-his-unrecognisable-life-after-20-years-of-sobriety-2580426/"] },
+    ],
+    story: "2002년, 블랙아웃 상태로 운전하다 LA의 한 건물을 들이받았다. 크게 다친 채 휠체어를 타고 유치장에 갇혔고, 그 뒤로 술을 끊었다. 이후 드라마 〈캐스트로피〉를 쓰고 연기했고, 〈데드풀 2〉의 평범한 아저씨 피터로 사랑받았다." },
+
+  { id: "clapton", name: "Eric Clapton", ko: "에릭 클랩튼", role: "기타리스트 · 〈Tears in Heaven〉", tint: "indigo", since: "1987",
+    photos: [["clapton", [.58, .40]], ["clapton-2", [.40, .16]], ["clapton-3", [.53, .15]]],
+    quotes: [
+      { t: "I'd probably be dead if I hadn't gotten straight.", ko: "술을 끊지 않았다면, 아마 죽었을 거예요.", s: ["인터뷰 인용 · Good News Magazine", "https://goodnewsmag.org/the-crossroads-sobriety-and-the-grave/"] },
+      { t: "It's a gift I've been given and the best way to honor is to stay clean and sober to be able to do it as well as I can.", ko: "이건 제가 받은 선물이에요. 그걸 존중하는 가장 좋은 방법은, 맑은 정신으로 할 수 있는 한 잘 해내는 거예요.", s: ["인터뷰 인용 · Good News Magazine", "https://goodnewsmag.org/the-crossroads-sobriety-and-the-grave/"] },
+      { t: "…at night, to express gratitude for my life and, most of all, for my sobriety.", ko: "밤마다 제 삶에, 그리고 무엇보다 술을 끊은 것에 감사해요.", s: ["자서전 『Clapton』, 2007 · Good News Magazine", "https://goodnewsmag.org/the-crossroads-sobriety-and-the-grave/"] },
+    ],
+    story: "1970~80년대 헤로인과 술에 빠져 살았다. 1987년 두 번째 재활 끝에 술을 끊었다. 네 살 아들을 사고로 잃었을 때도 술 대신 〈Tears in Heaven〉을 썼다. 1998년엔 카리브해 앤티가에 중독 치료 센터 ‘크로스로드’를 세웠다." },
+
+  { id: "adams", name: "Tony Adams", ko: "토니 애덤스", role: "축구 선수 · 아스널 전 주장", tint: "red", since: "1996-08-16",
+    photos: [["adams", [.50, .41]]],
+    quotes: [
+      { t: "I didn't have an alcohol problem. I had a me problem.", ko: "저한테 술 문제가 있었던 게 아니에요. ‘나’ 문제가 있었던 거죠.", s: ["GB News 보도", "https://www.gbnews.com/sport/football/tony-adams-alcohol-struggles-sobriety-milestone"] },
+      { t: "I fixed me, and I started to like myself a bit.", ko: "저를 고쳤고, 제 자신이 조금씩 좋아지기 시작했어요.", s: ["GB News 보도", "https://www.gbnews.com/sport/football/tony-adams-alcohol-struggles-sobriety-milestone"] },
+    ],
+    story: "아스널과 잉글랜드 대표팀의 주장. 유로 96 탈락 뒤 44일 동안 술을 마시다 바닥을 쳤다. 1996년 8월 16일, 현역 주장이던 그는 알코올 중독을 공개하고 술을 끊었다. 2000년엔 운동선수들의 중독 치료를 돕는 ‘스포팅 찬스’를 세웠다." },
+
+  { id: "hwang", name: "황정민", ko: "Hwang Jung-min", role: "배우 · 〈신세계〉", tint: "orange", since: "2024-02", lang: "ko",
+    photos: [["hwang", [.50, .19]]],
+    quotes: [
+      { t: "아침에 일어날 때 너무 상쾌하더라. 온 장기가 제대로 움직인다는 걸 이제야 느낀다", ko: "금주 1년 반쯤, 웹예능 〈핑계고〉에서", s: ["〈핑계고〉, 2025 · 엑스포츠뉴스 보도", "https://www.xportsnews.com/article/2167322"] },
+      { t: "술을 3개월 안 먹으니까 얼굴이 맑아지길래 ‘얼굴이 빨간 게 술 때문이었구나’ 생각했다. 그런데 한 4개월 지나니까 색깔이 다시 돌아오더라", ko: "‘술톤’으로 유명했던 얼굴에 대해", s: ["〈핑계고〉, 2025 · 엑스포츠뉴스 보도", "https://www.xportsnews.com/article/2167322"] },
+      { t: "나한테 휴식을 주자는 생각으로 ‘1년만 쉬어보자’ 해서 금주하고 있다", ko: "MBC 〈굿데이〉, 2025년 2월", s: ["MBC 〈굿데이〉, 2025 · 머니투데이 보도", "https://www.mt.co.kr/entertainment/2025/02/24/2025022323033855784"] },
+    ],
+    story: "〈신세계〉와 〈국제시장〉의 배우. 원래 얼굴이 붉어 ‘술톤’이라는 별명이 있었다. 쉰 살에 자신에게 주는 선물로 담배를 끊었더니 술이 더 늘었다고. 기억력이 떨어지고 잔실수가 많아지자 2024년 2월 ‘1년만 쉬어보자’며 술을 끊었고, 그 1년이 지나서도 계속 마시지 않는다." },
+
+  { id: "cha", name: "차태현", ko: "Cha Tae-hyun", role: "배우 · 〈과속스캔들〉", tint: "mint", since: "2023", approx: true, lang: "ko",
+    photos: [["cha", [.50, .13]], ["cha-2", [.50, .32]]],
+    quotes: [
+      { t: "술을 끊은 건 아니고, 어떻게 보면 끊긴 거죠", ko: "금주 3년째, 유튜브 〈비보티비〉에서", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074950/"] },
+    ],
+    story: "〈엽기적인 그녀〉와 〈과속스캔들〉의 배우. 술자리를 무척 좋아했고, 그게 스스로에게 주는 보상이었다고 한다. 2023년 무렵부터 술을 마시지 않는다. 지금은 무알코올 맥주를 챙겨 가서 술자리는 그대로 즐긴다고." },
+
+  { id: "songeuni", name: "송은이", ko: "Song Eun-i", role: "방송인 · 〈비보티비〉", tint: "pink", since: "2026-01-07", lang: "ko",
+    photos: [["songeuni", [.48, .28]]],
+    quotes: [
+      { t: "1월 7일부터 계속 금주하고 있다. 정확하게 끊었다", ko: "유튜브 〈비보티비〉, 2026년 9월", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
+      { t: "난 내가 너무 자랑스러워서 얘기하는 거다", ko: "금주를 처음 공개하며", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
+      { t: "건강한 할머니가 되려고 좋은 걸 챙겨 먹는데… 안 좋은 걸 안 먹는다는 생각을 못 한 거다", ko: "술을 끊은 이유", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
+      { t: "안 좋은 것부터 끊어야겠다는 생각이 컸다", ko: "술을 끊은 이유", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
+    ],
+    story: "개그우먼 출신 방송인이자 콘텐츠 제작사 대표. 숙취로 촬영장을 이탈한 적도 있을 만큼 술을 즐겼다. 2026년 1월 7일부터 술을 끊었고, 8개월째 되던 9월 방송에서 스스로가 너무 자랑스러워서 말한다며 공개했다. 건강한 할머니가 되고 싶어서라고." },
 ];
 
 /* 사진: Wikimedia Commons — [작가, 라이선스, 파일 페이지] */
@@ -605,6 +749,29 @@ const CREDITS = {
   "alice-2": ["Harald Krichel", "CC BY-SA 4.0", "File:Alice_Cooper-6477.jpg"],
   "alice-3": ["Sven Mandel", "CC BY-SA 4.0", "File:Alice_Cooper_-_2019254212136_2019-09-11_Alice_Cooper_-_0142_-_B70I0143.jpg"],
   "hopkins-2": ["Elena Torre", "CC BY-SA 2.0", "File:Anthony_Hopkins-Tuscan_Sun_Festival.jpg"],
+  "tolstoy": ["Sergei Prokudin-Gorskii", "Public domain", "File:L.N.Tolstoy_Prokudin-Gorsky.jpg"],
+  "tolstoy-2": ["Internet Archive Book Images", "No restrictions", "File:Russia_then_and_now%2C_1892-1917%3B_my_mission_to_Russia_during_the_famine_of_1891-1892%2C_with_data_bearing_upon_Russia_of_to-day_%281917%29_%2814761078276%29.jpg"],
+  "lamott": ["Zboralski", "CC BY-SA 3.0", "File:Anne-Lamott-2013-San-Francisco_%28cropped%29.jpg"],
+  "billw": ["A.A. World Services", "Public domain", "File:Bill_W._of_Alcoholics_Anonymous.png"],
+  "bford": ["David Hume Kennerly", "Public domain", "File:Betty_Ford%2C_official_White_House_photo_color%2C_1974.jpg"],
+  "aldrin": ["The White House", "Public domain", "File:Buzz_Aldrin_in_2019_%28cropped%29.jpg"],
+  "aldrin-2": ["Neil A. Armstrong (NASA)", "Public domain", "File:A_Man_on_the_Moon%2C_AS11-40-5903_%28cropped%29.jpg"],
+  "aldrin-3": ["Kevin M. Gill", "CC BY 2.0", "File:Buzz_Aldrin-_Apollo_11_%2846937504952%29.jpg"],
+  "bush": ["Eric Draper", "Public domain", "File:George-W-Bush.jpeg"],
+  "bush-2": ["Petty Officer 1st Class Brien Aho", "Public domain", "File:Monsoor_family_receives_Medal_of_Honor_DVIDS98425.jpg"],
+  "ferguson": ["Vague on the how", "CC BY 2.0", "File:Craig_Ferguson%2C_2014.jpg"],
+  "ferguson-2": ["Gage Skidmore", "CC BY-SA 2.0", "File:Craig_Ferguson_%289362716303%29_%28cropped%29.jpg"],
+  "maron": ["Bea Phi", "CC BY-SA 4.0", "File:Marc_Maron_at_SXSW_2025_02.jpg"],
+  "maron-2": ["Claire Fridkin", "CC BY-SA 4.0", "File:Marc_Maron_in_2026_at_a_live_episode_recording_of_On_with_Kara_Swisher_01.jpg"],
+  "delaney": ["Greg2600", "CC BY-SA 2.0", "File:Rob_Delaney_%2840443370673%29.jpg"],
+  "clapton": ["John Bauld", "CC BY 2.0", "File:TIFF_2017_Eric_Clapton_%2836334520654%29_%28cropped%29.jpg"],
+  "clapton-2": ["Raph_PH", "CC BY 2.0", "File:Eric_Clapton_-_Royal_Albert_Hall_-_Wednesday_24th_May_2017_EricClaptonRAH240517-30_%2834987232355%29_%28cropped%29.jpg"],
+  "clapton-3": ["Steve Proctor", "CC BY-SA 4.0", "File:Eric_Clapton_01May2015.jpg"],
+  "adams": ["Jade Moulds", "Public domain", "File:Tony_Adams_2017_portrait.jpg"],
+  "hwang": ["Republic of Korea", "CC BY-SA 4.0", "File:Hwang_Jung-min_in_July_2026_%28cropped%29.jpg"],
+  "songeuni": ["tenasia10", "CC BY 3.0", "File:%28TV10%29_%EC%82%AC%EC%9D%B4%EB%8B%A4_%EA%B9%80%EC%98%81%EC%B2%A0%3D%EC%9D%B4%EC%98%81%EC%9E%90%EB%8A%94_%EC%9E%90%EC%9B%85%EB%8F%99%EC%B2%B4_%EC%86%A1%EC%9D%80%EC%9D%B4_1m46s.jpg"],
+  "cha": ["sisaprime (일부 잘라 씀)", "CC BY 4.0", "File:%EC%98%81%ED%99%94_%27%EC%8B%A0%EA%B3%BC_%ED%95%A8%EA%BB%98%27_%EC%A3%84_%EC%99%80_%EB%B2%8C_20%EC%9D%BC_%EA%B0%9C%EB%B4%89_%2822%29.jpg"],
+  "cha-2": ["sisaprime (일부 잘라 씀)", "CC BY 4.0", "File:%EC%98%81%ED%99%94_%27%EC%8B%A0%EA%B3%BC_%ED%95%A8%EA%BB%98%27_%EC%A3%84_%EC%99%80_%EB%B2%8C_20%EC%9D%BC_%EA%B0%9C%EB%B4%89_%2819%29.jpg"],
 };
 
 /* ──────────────────────────────────────────────────────────── */
@@ -702,6 +869,7 @@ function quoteClass(q, lang) {
   if (q.roman) return "quote roman";
   const n = q.t.length;
   if (lang === "ja") return n > 40 ? "quote xl" : n > 16 ? "quote l" : "quote m";
+  if (lang === "ko") return n > 60 ? "quote xl" : n > 38 ? "quote l" : n > 20 ? "quote m" : "quote";
   return n > 110 ? "quote xl" : n > 72 ? "quote l" : n > 40 ? "quote m" : "quote";
 }
 
@@ -736,13 +904,15 @@ function buildCard(id) {
   if (id === "you") return buildYou();
   const p = BY_ID[id], lang = p.lang || "en", seen = lastSeen[id] || [];
   const qi = pickOther(p.quotes.length, seen[0]), pi = pickOther(p.photos.length, seen[1]);
-  const q = p.quotes[qi], [file, focus] = p.photos[pi];
+  const q = p.quotes[qi], [file, focus] = p.photos[pi] || [];
   const card = document.createElement("article");
-  card.className = "card";
+  card.className = file ? "card" : "card nophoto";
   card.style.cssText = tintVars(p.tint);
   card.innerHTML = `
-    <div class="wash" style="background-image:url(photos/wash/${file}.jpg?v=${PHOTO_V})"></div>
-    <div class="photo"><div class="kb"><img alt="${esc(p.name)}" decoding="async" draggable="false"></div></div>
+    ${file
+      ? `<div class="wash" style="background-image:url(photos/wash/${file}.jpg?v=${PHOTO_V})"></div>
+    <div class="photo"><div class="kb"><img alt="${esc(p.name)}" decoding="async" draggable="false"></div></div>`
+      : `<div class="wash"></div><div class="initial" aria-hidden="true">${esc(p.name.split(" ").map(w => w[0]).join(""))}</div>`}
     <div class="top-shade"></div>
     <div class="copy">
       <div>${q.roman ? "" : '<span class="qmark" aria-hidden="true">“</span>'}
@@ -753,6 +923,7 @@ function buildCard(id) {
     </div>`;
   card._qi = qi; card._pi = pi; card._focus = focus;
   const img = card.querySelector("img");
+  if (!img) { card._ready = Promise.resolve(); return card; }
   card._ready = new Promise(res => {
     img.onload = () => { place(card); res(); };
     img.onerror = () => { img.remove(); res(); };
@@ -934,11 +1105,13 @@ function openStory() {
   if (current === "you") return openMine();
   const p = BY_ID[current];
   if (!p || !cur) return;
-  const s = parseSince(p.since), e = elapsed(s.date), lang = p.lang || "en";
+  const s = parseSince(p.since), lang = p.lang || "en";
+  const end = p.died ? parseSince(p.died).date : new Date(), e = elapsed(s.date, end);
   $("s-name").textContent = p.name;
   $("s-sub").textContent = `${p.ko} · ${p.role}`;
   $("s-since").textContent = sinceShort(s, p.approx);
-  if (s.prec === "year") { $("s-count-label").textContent = "지난 해"; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
+  if (p.died) { $("s-count-label").textContent = `${end.getFullYear()}년 별세까지`; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
+  else if (s.prec === "year") { $("s-count-label").textContent = "지난 해"; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
   else { $("s-count-label").textContent = "지난 날"; $("s-count").textContent = (s.prec === "month" ? "약 " : "") + e.days.toLocaleString("ko-KR") + "일"; }
   $("s-story").textContent = p.story;
   const order = [cur._qi, ...p.quotes.map((_, i) => i).filter(i => i !== cur._qi)];
@@ -950,10 +1123,10 @@ function openStory() {
       <figcaption>${esc(q.s[0])} · <a href="${esc(q.s[1])}" target="_blank" rel="noopener">원문</a></figcaption>
     </figure>`;
   }).join("");
-  const file = p.photos[cur._pi][0], cr = CREDITS[file];
+  const file = (p.photos[cur._pi] || [])[0], cr = file && CREDITS[file];
   $("s-credit").innerHTML = cr
     ? `사진 · ${esc(cr[0])} · ${esc(cr[1])} · <a href="https://commons.wikimedia.org/wiki/${cr[2]}" target="_blank" rel="noopener">Wikimedia Commons</a>`
-    : "";
+    : "자유롭게 쓸 수 있는 사진이 없어 색으로만 보여줘요.";
   open($("story"));
 }
 
