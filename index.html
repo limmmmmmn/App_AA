@@ -1,4 +1,17 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AA</title>
+<meta name="theme-color" content="#0e0d0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AA">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@400;600&display=swap">
@@ -209,6 +222,8 @@ a { color: inherit; }
   .card, .copy > *, .sheet, .scrim { transition-duration: .01s !important; transition-delay: 0s !important; }
 }
 </style>
+</head>
+<body>
 
 <div class="app">
   <main class="stage" id="stage" tabindex="0" aria-label="탭하면 다음 사람">
@@ -745,4 +760,11 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) rend
 renderMe();
 next();
 showHint();
+
+// Offline cache for the home-screen app (skipped where there is no manifest, e.g. the Claude artifact copy)
+if ("serviceWorker" in navigator && document.querySelector('link[rel="manifest"]')) {
+  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
 </script>
+</body>
+</html>
