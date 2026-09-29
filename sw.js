@@ -1,10 +1,12 @@
 // Bump CACHE when photos or icons change so phones pick up the new files.
-const CACHE = "aa-v1";
-const PHOTOS = [
+const CACHE = "aa-v2";   // index.html의 PHOTO_V와 맞춰서 올리기
+const V = "?v=2";
+const IDS = [
   "alice", "brolin", "cooper", "curtis", "downey", "elton", "eminem", "farrell",
   "florence", "hardy", "hathaway", "holland", "hopkins", "jackson", "king", "lowe",
   "matsushige", "mcgregor", "oldman", "radcliffe", "ringo", "slash", "washington",
-].map(id => `photos/${id}.jpg`);
+];
+const PHOTOS = IDS.flatMap(id => [`photos/${id}.jpg${V}`, `photos/wash/${id}.jpg${V}`]);
 const CORE = ["./", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", ...PHOTOS];
 
 self.addEventListener("install", e => {
