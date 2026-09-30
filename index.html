@@ -998,10 +998,13 @@ function buildYou() {
   return card;
 }
 
-function buildCard(id) {
+// `keep` holds the line and photo already shown for this spot in the history,
+// so swiping back brings up exactly what was on screen before.
+function buildCard(id, keep = {}) {
   if (id === "you") return buildYou();
   const p = BY_ID[id], lang = p.lang || "en", seen = lastSeen[id] || [];
-  const qi = pickOther(p.quotes.length, seen[0]), pi = pickOther(p.photos.length, seen[1]);
+  const qi = keep.qi != null ? keep.qi : pickOther(p.quotes.length, seen[0]);
+  const pi = keep.pi != null ? keep.pi : pickOther(p.photos.length, seen[1]);
   const q = p.quotes[qi], [file, focus] = p.photos[pi] || [];
   const card = document.createElement("article");
   card.className = file ? "card" : "card nophoto";
@@ -1050,7 +1053,7 @@ function place(card) {
 
 /* ── deck order: shuffle bag, no repeats until everyone is seen ── */
 let bag = [];
-const history = [];
+const history = [];   // [{ id, qi, pi }] — every card seen this session, in order
 let pos = -1;
 let current = null;
 
@@ -1062,7 +1065,7 @@ function roster() {
 function refill() {
   const a = roster();
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-  const last = history[history.length - 1];
+  const last = history.length ? history[history.length - 1].id : null;
   if (a.length > 1 && a[a.length - 1] === last) [a[0], a[a.length - 1]] = [a[a.length - 1], a[0]];
   bag = a;
 }
@@ -1070,16 +1073,15 @@ function draw() {
   if (!bag.length) refill();
   return bag.pop();
 }
-function peekId(dir) {
+function peek(dir) {
   if (dir > 0) {
-    if (pos >= history.length - 1) history.push(draw());
+    if (pos >= history.length - 1) history.push({ id: draw() });
     return history[pos + 1];
   }
   return pos > 0 ? history[pos - 1] : null;
 }
 function preloadAhead() {
-  const id = peekId(1);
-  const p = BY_ID[id];
+  const p = BY_ID[peek(1).id];
   if (p) p.photos.forEach(([f]) => { const im = new Image(); im.src = `photos/${f}.jpg?v=${PHOTO_V}`; });
 }
 
@@ -1089,9 +1091,10 @@ let neighbor = null;   // { dir, el, id } — the card being dragged in
 let busy = false;
 const W = () => stage.clientWidth;
 
-function mount(id) {
-  const el = buildCard(id);
-  el.dataset.id = id;
+function mount(entry) {
+  const el = buildCard(entry.id, entry);
+  if (entry.qi == null) { entry.qi = el._qi; entry.pi = el._pi; }   // pin the first pick
+  el.dataset.id = entry.id;
   deck.appendChild(el);
   return el;
 }
@@ -1104,11 +1107,11 @@ function setCurrent(el, id) {
 function ensureNeighbor(dir) {
   if (neighbor && neighbor.dir === dir) return neighbor;
   dropNeighbor();
-  const id = peekId(dir);
-  if (!id) return null;
-  const el = mount(id);
+  const entry = peek(dir);
+  if (!entry) return null;
+  const el = mount(entry);
   el.style.transform = `translate3d(${dir * W()}px, 0, 0)`;
-  neighbor = { dir, el, id };
+  neighbor = { dir, el, id: entry.id };
   return neighbor;
 }
 function dropNeighbor() { if (neighbor) { neighbor.el.remove(); neighbor = null; } }
@@ -1149,11 +1152,11 @@ function go(dir) {
 }
 
 function start() {
-  history.push(draw());
+  history.push({ id: draw() });
   pos = 0;
   const el = mount(history[0]);
   el.classList.add("enter");
-  setCurrent(el, history[0]);
+  setCurrent(el, history[0].id);
   preloadAhead();
 }
 
@@ -1250,13 +1253,13 @@ $("my-save").addEventListener("click", () => {
   if (!bag.includes("you")) bag.splice(Math.floor(Math.random() * (bag.length + 1)), 0, "you");
   close();
   if (current === "you") {            // redraw my own card in place
-    const el = mount("you");
+    const el = mount({ id: "you" });
     cur.remove();
     setCurrent(el, "you");
     return;
   }
   dropNeighbor();
-  history.splice(pos + 1, 0, "you");
+  history.splice(pos + 1, 0, { id: "you" });
   setTimeout(() => go(1), 60);
 });
 $("my-clear").addEventListener("click", () => {
@@ -1267,9 +1270,9 @@ $("my-clear").addEventListener("click", () => {
   dropNeighbor();
   // take my card out of the history so swiping back never lands on it
   for (let i = history.length - 1; i >= 0; i--) {
-    if (history[i] === "you" && i !== pos) { history.splice(i, 1); if (i < pos) pos--; }
+    if (history[i].id === "you" && i !== pos) { history.splice(i, 1); if (i < pos) pos--; }
   }
-  if (current === "you") { history.splice(pos + 1, 0, draw()); go(1); setTimeout(() => { history.splice(pos - 1, 1); pos--; }, 500); }
+  if (current === "you") { history.splice(pos + 1, 0, { id: draw() }); go(1); setTimeout(() => { history.splice(pos - 1, 1); pos--; }, 500); }
 });
 
 document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", close));
