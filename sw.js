@@ -13,6 +13,7 @@ const IDS = [
   "shakespeare", "dostoevsky", "bronte", "zola", "montaigne", "seneca", "plato", "aristotle",
   "franklin", "lincoln", "nietzsche",
   "james", "jung", "mate", "lembke", "murthy", "stuart", "jamison",
+  "trejo", "waits", "sixx", "duff", "gahan", "steveo", "msheen", "wood", "walsh", "manganiello",
 ];
 const PHOTOS = IDS.flatMap(id => [`photos/${id}.jpg${V}`, `photos/wash/${id}.jpg${V}`]);
 const CORE = ["./", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", ...PHOTOS];
