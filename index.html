@@ -282,12 +282,12 @@ a { color: var(--tint-text); text-decoration: none; }
     </div>
     <button class="x" type="button" data-close aria-label="닫기"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
   </div>
-  <dl class="facts">
+  <dl class="facts" id="s-facts">
     <div><dt>금주 시작</dt><dd id="s-since"></dd></div>
     <div><dt id="s-count-label">지난 날</dt><dd id="s-count"></dd></div>
   </dl>
   <p class="story" id="s-story"></p>
-  <h3 class="s-h">이 사람이 한 말</h3>
+  <h3 class="s-h" id="s-h">이 사람이 한 말</h3>
   <div class="quotes" id="s-quotes"></div>
   <p class="credit" id="s-credit"></p>
 </section>
@@ -663,31 +663,120 @@ const PEOPLE = [
     ],
     story: "아스널과 잉글랜드 대표팀의 주장. 유로 96 탈락 뒤 44일 동안 술을 마시다 바닥을 쳤다. 1996년 8월 16일, 현역 주장이던 그는 알코올 중독을 공개하고 술을 끊었다. 2000년엔 운동선수들의 중독 치료를 돕는 ‘스포팅 찬스’를 세웠다." },
 
-  { id: "hwang", name: "황정민", ko: "Hwang Jung-min", role: "배우 · 〈신세계〉", tint: "orange", since: "2024-02", lang: "ko",
-    photos: [["hwang", [.50, .19]]],
+  /* ── words on drink from novels, plays and philosophy (kind: "text") ── */
+  { id: "shakespeare", kind: "text", name: "William Shakespeare", ko: "윌리엄 셰익스피어", role: "극작가", tint: "red",
+    photos: [["shakespeare", [.50, .30]]],
     quotes: [
-      { t: "아침에 일어날 때 너무 상쾌하더라. 온 장기가 제대로 움직인다는 걸 이제야 느낀다", ko: "금주 1년 반쯤, 웹예능 〈핑계고〉에서", s: ["〈핑계고〉, 2025 · 엑스포츠뉴스 보도", "https://www.xportsnews.com/article/2167322"] },
-      { t: "술을 3개월 안 먹으니까 얼굴이 맑아지길래 ‘얼굴이 빨간 게 술 때문이었구나’ 생각했다. 그런데 한 4개월 지나니까 색깔이 다시 돌아오더라", ko: "‘술톤’으로 유명했던 얼굴에 대해", s: ["〈핑계고〉, 2025 · 엑스포츠뉴스 보도", "https://www.xportsnews.com/article/2167322"] },
-      { t: "나한테 휴식을 주자는 생각으로 ‘1년만 쉬어보자’ 해서 금주하고 있다", ko: "MBC 〈굿데이〉, 2025년 2월", s: ["MBC 〈굿데이〉, 2025 · 머니투데이 보도", "https://www.mt.co.kr/entertainment/2025/02/24/2025022323033855784"] },
+      { t: "O God, that men should put an enemy in their mouths to steal away their brains!", ko: "아, 사람들이 제 입에 적을 들여 자기 머리를 훔쳐 가게 하다니!", w: "『오셀로』 2막 3장 · 카시오", s: ["『오셀로』(1604) · Project Gutenberg", "https://www.gutenberg.org/ebooks/1531"] },
+      { t: "O thou invisible spirit of wine, if thou hast no name to be known by, let us call thee devil!", ko: "오, 보이지 않는 술의 영이여, 불릴 이름이 없다면 너를 악마라 부르겠다!", w: "『오셀로』 2막 3장 · 카시오", s: ["『오셀로』(1604) · Project Gutenberg", "https://www.gutenberg.org/ebooks/1531"] },
+      { t: "I have lost the immortal part of myself, and what remains is bestial.", ko: "나의 불멸하는 부분을 잃었다. 남은 건 짐승뿐이다.", w: "『오셀로』 2막 3장 · 술에 취해 싸운 뒤 명예를 잃은 카시오", s: ["『오셀로』(1604) · Project Gutenberg", "https://www.gutenberg.org/ebooks/1531"] },
+      { t: "To be now a sensible man, by and by a fool, and presently a beast!", ko: "방금까지 멀쩡한 사람이, 이윽고 바보가 되고, 곧 짐승이 되다니!", w: "『오셀로』 2막 3장 · 카시오", s: ["『오셀로』(1604) · Project Gutenberg", "https://www.gutenberg.org/ebooks/1531"] },
+      { t: "Every inordinate cup is unbless'd, and the ingredient is a devil.", ko: "넘치는 잔마다 저주가 깃들어 있고, 그 안에 든 건 악마다.", w: "『오셀로』 2막 3장 · 카시오", s: ["『오셀로』(1604) · Project Gutenberg", "https://www.gutenberg.org/ebooks/1531"] },
+      { t: "They clepe us drunkards, and with swinish phrase soil our addition.", ko: "다른 나라들은 우리를 술꾼이라 부르고, 돼지 같은 말로 우리 이름을 더럽힌다.", w: "『햄릿』 1막 4장 · 덴마크 궁정의 술판을 두고", s: ["『햄릿』(1601) · Project Gutenberg", "https://www.gutenberg.org/ebooks/1524"] },
     ],
-    story: "〈신세계〉와 〈국제시장〉의 배우. 원래 얼굴이 붉어 ‘술톤’이라는 별명이 있었다. 쉰 살에 자신에게 주는 선물로 담배를 끊었더니 술이 더 늘었다고. 기억력이 떨어지고 잔실수가 많아지자 2024년 2월 ‘1년만 쉬어보자’며 술을 끊었고, 그 1년이 지나서도 계속 마시지 않는다." },
+    story: "『오셀로』의 카시오는 이아고의 꾐에 넘어가 술을 마시고 싸움을 벌이다 부관 자리를 잃는다. 술이 깬 뒤 그는 명예를 잃었다며 절규한다. 『햄릿』에서 햄릿은 밤마다 이어지는 덴마크 궁정의 술판 때문에 나라 전체가 술꾼 소리를 듣는다고 개탄한다. 셰익스피어에게 술은 사람을 짐승으로 만드는 것이었다." },
 
-  { id: "cha", name: "차태현", ko: "Cha Tae-hyun", role: "배우 · 〈과속스캔들〉", tint: "mint", since: "2023", approx: true, lang: "ko",
-    photos: [["cha", [.50, .13]], ["cha-2", [.50, .32]]],
+  { id: "dostoevsky", kind: "text", name: "Fyodor Dostoevsky", ko: "표도르 도스토옙스키", role: "소설가", tint: "orange",
+    photos: [["dostoevsky", [.50, .28]]],
     quotes: [
-      { t: "술을 끊은 건 아니고, 어떻게 보면 끊긴 거죠", ko: "금주 3년째, 유튜브 〈비보티비〉에서", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074950/"] },
+      { t: "I drink so that I may suffer twice as much!", ko: "나는 두 배로 괴로워하려고 마신다!", w: "『죄와 벌』 · 마르멜라도프", s: ["『죄와 벌』(1866) · 콘스턴스 가넷 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/2554"] },
+      { t: "And the more I drink the more I feel it.", ko: "마시면 마실수록, 그 고통이 더 느껴진다.", w: "『죄와 벌』 · 병든 아내를 두고 마시는 마르멜라도프", s: ["『죄와 벌』(1866) · 콘스턴스 가넷 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/2554"] },
     ],
-    story: "〈엽기적인 그녀〉와 〈과속스캔들〉의 배우. 술자리를 무척 좋아했고, 그게 스스로에게 주는 보상이었다고 한다. 2023년 무렵부터 술을 마시지 않는다. 지금은 무알코올 맥주를 챙겨 가서 술자리는 그대로 즐긴다고." },
+    story: "『죄와 벌』 초반, 선술집에서 라스콜니코프를 붙잡고 끝없이 고백을 늘어놓는 퇴직 관리 마르멜라도프. 그는 병든 아내와 굶는 아이들의 돈까지 술에 쏟고, 그 죄책감을 느끼려고 또 마신다. 술은 그를 위로하지 않고 고통을 두 배로 만들 뿐이다. 그는 결국 취한 채 마차에 치여 죽는다." },
 
-  { id: "songeuni", name: "송은이", ko: "Song Eun-i", role: "방송인 · 〈비보티비〉", tint: "pink", since: "2026-01-07", lang: "ko",
-    photos: [["songeuni", [.48, .28]]],
+  { id: "london", kind: "text", name: "Jack London", ko: "잭 런던", role: "소설가", tint: "yellow",
+    photos: [["london", [.50, .22]], ["london-2", [.40, .27]]],
     quotes: [
-      { t: "1월 7일부터 계속 금주하고 있다. 정확하게 끊었다", ko: "유튜브 〈비보티비〉, 2026년 9월", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
-      { t: "난 내가 너무 자랑스러워서 얘기하는 거다", ko: "금주를 처음 공개하며", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
-      { t: "건강한 할머니가 되려고 좋은 걸 챙겨 먹는데… 안 좋은 걸 안 먹는다는 생각을 못 한 거다", ko: "술을 끊은 이유", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
-      { t: "안 좋은 것부터 끊어야겠다는 생각이 컸다", ko: "술을 끊은 이유", s: ["〈비보티비〉, 2026 · TV리포트 보도", "https://tvreport.co.kr/entertainment/article/1074647/"] },
+      { t: "He is the king of liars.", ko: "그는 거짓말쟁이들의 왕이다.", w: "『존 발리콘』 · 술을 ‘존 발리콘’이라는 사람으로 부르며", s: ["『존 발리콘』(1913) · Project Gutenberg", "https://www.gutenberg.org/ebooks/318"] },
+      { t: "His way leads to truth naked, and to death.", ko: "그의 길은 벌거벗은 진실로, 그리고 죽음으로 이어진다.", w: "『존 발리콘』 · 술에 대해", s: ["『존 발리콘』(1913) · Project Gutenberg", "https://www.gutenberg.org/ebooks/318"] },
+      { t: "He is a red-handed killer, and he slays youth.", ko: "그는 손에 피를 묻힌 살인자이고, 젊음을 죽인다.", w: "『존 발리콘』 · 술에 대해", s: ["『존 발리콘』(1913) · Project Gutenberg", "https://www.gutenberg.org/ebooks/318"] },
+      { t: "Brain and body, scorched and jangled and poisoned, return to be tuned up by the very poison that caused the damage.", ko: "그을리고 흔들리고 중독된 머리와 몸이, 바로 그 상처를 낸 독으로 다시 조율되러 돌아온다.", w: "『존 발리콘』 · 해장술에 대해", s: ["『존 발리콘』(1913) · Project Gutenberg", "https://www.gutenberg.org/ebooks/318"] },
     ],
-    story: "개그우먼 출신 방송인이자 콘텐츠 제작사 대표. 숙취로 촬영장을 이탈한 적도 있을 만큼 술을 즐겼다. 2026년 1월 7일부터 술을 끊었고, 8개월째 되던 9월 방송에서 스스로가 너무 자랑스러워서 말한다며 공개했다. 건강한 할머니가 되고 싶어서라고." },
+    story: "『야성의 부름』을 쓴 미국 작가의 자전적 소설. 다섯 살에 처음 맥주에 취한 뒤 평생 술과 씨름한 이야기를 썼다. 술을 ‘존 발리콘’이라는 사람으로 그리며, 그가 주는 것이 결국 거짓 위로와 죽음이라고 말한다. 이 책은 미국 금주 운동에 쓰이기도 했다. 잭 런던은 3년 뒤 마흔 살에 세상을 떠났다." },
+
+  { id: "bronte", kind: "text", name: "Anne Brontë", ko: "앤 브론테", role: "소설가", tint: "pink",
+    photos: [["bronte", [.48, .36]]],
+    quotes: [
+      { t: "I was determined that all should be equally hateful to him.", ko: "나는 그 모든 술이 아이에게 똑같이 끔찍해지게 만들기로 했다.", w: "『와일드펠 홀의 소작인』 · 어린 아들을 두고, 헬렌", s: ["『와일드펠 홀의 소작인』(1848) · Project Gutenberg", "https://www.gutenberg.org/ebooks/969"] },
+      { t: "…the taste, the smell, the sight of any one of them is sufficient to make him sick.", ko: "이제 아이는 술의 맛도, 냄새도, 보기만 해도 속이 울렁거린다고 한다.", w: "『와일드펠 홀의 소작인』 · 헬렌", s: ["『와일드펠 홀의 소작인』(1848) · Project Gutenberg", "https://www.gutenberg.org/ebooks/969"] },
+    ],
+    story: "『제인 에어』의 샬럿, 『폭풍의 언덕』의 에밀리와 함께 브론테 자매의 막내. 술에 무너진 남편을 떠나 아들을 데리고 도망친 여성 헬렌의 이야기를 썼다. 헬렌은 아들이 아버지를 닮지 않도록, 술만 보면 속이 울렁거리게 만든다. 앤의 오빠 브랜웰도 술과 아편으로 서른한 살에 세상을 떠났다." },
+
+  { id: "zola", kind: "text", name: "Émile Zola", ko: "에밀 졸라", role: "소설가", tint: "teal",
+    photos: [["zola", [.45, .36]]],
+    quotes: [
+      { t: "…the still, the machine which manufactured drunkards… with the profound trepidation of its hellish cookery.", ko: "술꾼을 찍어내는 기계, 증류기가 지옥의 요리를 끓이며 깊게 떨고 있었다.", w: "『목로주점』 · 선술집 안뜰의 증류기", s: ["『목로주점(L'Assommoir)』(1877) · 영역본 · Project Gutenberg", "https://www.gutenberg.org/ebooks/8600"] },
+    ],
+    story: "파리 노동자 동네를 배경으로, 성실하던 세탁부 제르베즈와 지붕공 쿠포가 술에 조금씩 삼켜지는 과정을 그린 소설. 쿠포는 결국 알코올성 섬망으로 정신병원에서 죽고, 제르베즈도 굶주림 속에 쓸쓸히 죽는다. 졸라는 술을 낭만이 아니라 가난과 함께 사람을 부수는 기계로 그렸다." },
+
+  { id: "montaigne", kind: "text", name: "Michel de Montaigne", ko: "미셸 드 몽테뉴", role: "철학자 · 『에세』", tint: "purple",
+    photos: [["montaigne", [.47, .30]]],
+    quotes: [
+      { t: "Drunkenness seems to me to be a gross and brutish vice.", ko: "술 취함은 내가 보기에 조잡하고 짐승 같은 악덕이다.", w: "『에세』 2권 2장 「술 취함에 대하여」", s: ["『에세』 · 찰스 코튼 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/3600"] },
+      { t: "This one is totally corporeal and earthly.", ko: "다른 악덕엔 지혜나 용기가 섞이기도 하지만, 이것만은 온전히 육체적이고 땅에 속한 것이다.", w: "『에세』 2권 2장 「술 취함에 대하여」", s: ["『에세』 · 찰스 코튼 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/3600"] },
+    ],
+    story: "16세기 프랑스 철학자이자, 에세이라는 글쓰기를 처음 만든 사람. 「술 취함에 대하여」에서 그는 다른 악덕에는 지혜나 용기, 재주가 섞여 있기도 하지만, 술 취함만은 온전히 몸에 속한 것이라고 썼다." },
+
+  { id: "seneca", kind: "text", name: "Seneca", ko: "세네카", role: "고대 로마 철학자", tint: "yellow",
+    photos: [["seneca", [.47, .33]]],
+    quotes: [
+      { t: "Drunkenness is nothing but a condition of insanity purposely assumed.", ko: "술 취함이란 일부러 뒤집어쓴 광기일 뿐이다.", w: "『루킬리우스에게 보내는 편지』 83", s: ["『루킬리우스에게 보내는 도덕 서한』 83 · 거마어 번역 · Wikisource", "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_83"] },
+      { t: "Prolong the drunkard's condition to several days; will you have any doubt about his madness?", ko: "취한 상태를 며칠만 늘려 보라. 그래도 그가 미쳤다는 걸 의심하겠는가?", w: "『루킬리우스에게 보내는 편지』 83", s: ["『루킬리우스에게 보내는 도덕 서한』 83 · 거마어 번역 · Wikisource", "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_83"] },
+      { t: "Even as it is, the madness is no less; it merely lasts a shorter time.", ko: "지금도 광기는 조금도 덜하지 않다. 그저 더 짧게 끝날 뿐이다.", w: "『루킬리우스에게 보내는 편지』 83", s: ["『루킬리우스에게 보내는 도덕 서한』 83 · 거마어 번역 · Wikisource", "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_83"] },
+      { t: "…how often the drunkard does things which make him blush when he is sober.", ko: "술꾼은 깨고 나면 얼굴이 붉어질 일을 얼마나 자주 저지르는가.", w: "『루킬리우스에게 보내는 편지』 83", s: ["『루킬리우스에게 보내는 도덕 서한』 83 · 거마어 번역 · Wikisource", "https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_83"] },
+    ],
+    story: "네로 황제의 스승이었던 스토아 철학자. 친구 루킬리우스에게 보낸 편지에서 술 취함을 ‘일부러 뒤집어쓴 광기’라고 불렀다. 술에 취해 친구 클레이토스를 찔러 죽인 알렉산드로스 대왕을 예로 들며, 취한 사람이 깨고 나서 부끄러워할 일을 얼마나 자주 하는지 보라고 썼다." },
+
+  { id: "plato", kind: "text", name: "Plato", ko: "플라톤", role: "고대 그리스 철학자 · 『국가』", tint: "blue",
+    photos: [["plato", [.50, .42]]],
+    quotes: [
+      { t: "Of all persons a guardian should be the last to get drunk and not know where in the world he is.", ko: "모든 사람 가운데, 나라를 지키는 사람이야말로 술에 취해 자기가 어디 있는지도 모르게 되어선 안 된다.", w: "『국가』 3권 · 소크라테스", s: ["『국가』 3권 · 벤저민 조잇 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/1497"] },
+      { t: "That a guardian should require another guardian to take care of him is ridiculous indeed.", ko: "지키는 사람이 자기를 지켜 줄 사람을 또 필요로 한다면, 그건 정말 우스운 일이다.", w: "『국가』 3권 · 글라우콘", s: ["『국가』 3권 · 벤저민 조잇 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/1497"] },
+    ],
+    story: "『국가』에서 소크라테스는 나라를 지킬 수호자를 어떻게 길러야 하는지 이야기하며, 그들이 가장 먼저 멀리해야 할 것으로 술 취함을 꼽는다. 남을 지켜야 할 사람이 제 몸 하나 가누지 못해 남의 보살핌을 받아야 한다면 우습다는 것이다." },
+
+  { id: "aristotle", kind: "text", name: "Aristotle", ko: "아리스토텔레스", role: "고대 그리스 철학자 · 『니코마코스 윤리학』", tint: "cyan",
+    photos: [["aristotle", [.50, .32]]],
+    quotes: [
+      { t: "Penalties are doubled in the case of drunkenness; for the moving principle is in the man himself, since he had the power of not getting drunk.", ko: "취해서 저지른 일엔 벌을 두 배로 준다. 그 원인이 그 사람 안에 있기 때문이다. 그에겐 취하지 않을 힘이 있었다.", w: "『니코마코스 윤리학』 3권 5장", s: ["『니코마코스 윤리학』 3권 · W. D. 로스 번역 · MIT Internet Classics Archive", "https://classics.mit.edu/Aristotle/nicomachaen.3.iii.html"] },
+      { t: "…his getting drunk was the cause of his ignorance.", ko: "그가 몰랐던 건, 그가 취했기 때문이다.", w: "『니코마코스 윤리학』 3권 5장", s: ["『니코마코스 윤리학』 3권 · W. D. 로스 번역 · MIT Internet Classics Archive", "https://classics.mit.edu/Aristotle/nicomachaen.3.iii.html"] },
+    ],
+    story: "『니코마코스 윤리학』에서 아리스토텔레스는 모르고 한 행동에도 책임이 있는지 묻고, 술에 취해 저지른 일을 대표적인 예로 든다. 취해서 몰랐다는 건 변명이 되지 않는다. 취하지 않을 수 있었던 사람은 바로 그 자신이기 때문이다." },
+
+  { id: "proverbs", kind: "text", name: "Book of Proverbs", ko: "잠언", role: "구약성경", tint: "indigo", mark: "잠언",
+    photos: [],
+    quotes: [
+      { t: "Wine is a mocker, strong drink is raging: and whosoever is deceived thereby is not wise.", ko: "포도주는 사람을 비웃게 하고, 독주는 사람을 날뛰게 한다. 거기에 속는 자는 지혜롭지 않다.", w: "20장 1절", s: ["잠언 20:1 · 킹 제임스 성경(KJV)", "https://bible-api.com/proverbs%2020:1?translation=kjv"] },
+      { t: "Who hath woe? who hath sorrow? who hath contentions? who hath babbling? who hath wounds without cause? who hath redness of eyes?", ko: "누구에게 재앙이 있는가? 누구에게 슬픔이 있는가? 누구에게 다툼과 원망이 있는가? 누가 까닭 없이 다치고, 누구의 눈이 충혈되었는가?", w: "23장 29절", s: ["잠언 23:29–32 · 킹 제임스 성경(KJV)", "https://bible-api.com/proverbs%2023:29-32?translation=kjv"] },
+      { t: "They that tarry long at the wine.", ko: "술자리에 오래 머무는 자들이다.", w: "23장 30절 · 앞 절의 물음에 대한 답", s: ["잠언 23:29–32 · 킹 제임스 성경(KJV)", "https://bible-api.com/proverbs%2023:29-32?translation=kjv"] },
+      { t: "At the last it biteth like a serpent, and stingeth like an adder.", ko: "마지막엔 뱀처럼 물고, 독사처럼 쏜다.", w: "23장 32절", s: ["잠언 23:29–32 · 킹 제임스 성경(KJV)", "https://bible-api.com/proverbs%2023:29-32?translation=kjv"] },
+    ],
+    story: "지혜의 말을 모아 놓은 구약성경의 책. 23장에는 술에 대한 긴 경고가 있다. 재앙과 슬픔, 다툼과 까닭 없는 상처가 누구에게 있느냐고 묻고, 술자리에 오래 머무는 자들이라고 답한다. 잔 속에서 붉게 빛나는 술을 쳐다보지도 말라고, 결국엔 뱀처럼 문다고 경고한다." },
+
+  { id: "franklin", kind: "text", name: "Benjamin Franklin", ko: "벤저민 프랭클린", role: "미국 건국의 아버지 · 『자서전』", tint: "mint",
+    photos: [["franklin", [.50, .30]]],
+    quotes: [
+      { t: "Temperance. Eat not to dullness; drink not to elevation.", ko: "절제. 둔해질 만큼 먹지 말고, 들뜰 만큼 마시지 말라.", w: "『자서전』 · 열세 가지 덕목 중 첫 번째", s: ["『벤저민 프랭클린 자서전』 · Project Gutenberg", "https://www.gutenberg.org/ebooks/20203"] },
+      { t: "I drank only water; the other workmen, near fifty in number, were great guzzlers of beer.", ko: "나는 물만 마셨다. 쉰 명 가까운 다른 일꾼들은 맥주를 들이붓는 사람들이었다.", w: "『자서전』 · 런던 인쇄소 시절", s: ["『벤저민 프랭클린 자서전』 · Project Gutenberg", "https://www.gutenberg.org/ebooks/20203"] },
+      { t: "…the Water-American, as they called me, was stronger than themselves, who drank strong beer!", ko: "그들이 ‘물 마시는 미국인’이라 부르던 내가, 독한 맥주를 마시는 그들보다 더 힘이 셌다!", w: "『자서전』 · 런던 인쇄소 시절", s: ["『벤저민 프랭클린 자서전』 · Project Gutenberg", "https://www.gutenberg.org/ebooks/20203"] },
+    ],
+    story: "열아홉 살, 런던의 인쇄소에서 일할 때 동료들은 맥주를 마셔야 힘이 난다고 믿으며 하루 종일 마셨다. 그는 물만 마시고도 무거운 활자판을 양손에 하나씩 들고 계단을 오르내렸다. 훗날 도덕적으로 완벽해지겠다며 열세 가지 덕목을 세웠는데, 그 첫 번째가 절제였다." },
+
+  { id: "lincoln", kind: "text", name: "Abraham Lincoln", ko: "에이브러햄 링컨", role: "제16대 미국 대통령", tint: "purple",
+    photos: [["lincoln", [.50, .36]]],
+    quotes: [
+      { t: "The demon of intemperance ever seems to have delighted in sucking the blood of genius and of generosity.", ko: "무절제라는 악마는 늘 재능 있고 너그러운 사람의 피를 빨아먹기를 즐기는 것 같다.", w: "금주 연설, 1842", s: ["워싱턴 금주 협회 연설, 1842 · Abraham Lincoln Online", "https://www.abrahamlincolnonline.org/lincoln/speeches/temperance.htm"] },
+      { t: "There seems ever to have been a proneness in the brilliant, and warm-blooded to fall into this vice.", ko: "빛나고 뜨거운 사람일수록 이 악덕에 빠지기 쉬웠던 것 같다.", w: "금주 연설, 1842", s: ["워싱턴 금주 협회 연설, 1842 · Abraham Lincoln Online", "https://www.abrahamlincolnonline.org/lincoln/speeches/temperance.htm"] },
+    ],
+    story: "대통령이 되기 19년 전, 서른세 살의 링컨이 스프링필드의 금주 모임에서 한 연설. 그는 술꾼을 손가락질하는 대신 같은 사람으로 대하라고 말했다. 그러면서도 술이 가장 빛나고 뜨거운 사람들을 먼저 앗아 간다고 슬퍼했다. 링컨 자신은 평생 술을 거의 마시지 않았다." },
+
+  { id: "nietzsche", kind: "text", name: "Friedrich Nietzsche", ko: "프리드리히 니체", role: "철학자 · 『이 사람을 보라』", tint: "green",
+    photos: [["nietzsche", [.47, .38]]],
+    quotes: [
+      { t: "A single glass of wine or beer a day is amply sufficient to turn life into a valley of tears for me.", ko: "하루 한 잔의 포도주나 맥주만으로도, 내 삶은 눈물의 골짜기가 되기에 충분하다.", w: "『이 사람을 보라』 · 「나는 왜 이렇게 영리한가」", s: ["『이 사람을 보라』(1888) · 앤서니 루도비치 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/52190"] },
+      { t: "…advise all more spiritual natures to abstain absolutely from alcohol. Water answers the purpose.", ko: "정신적인 사람이라면 누구든 술을 완전히 끊으라고 진심으로 권한다. 물이면 충분하다.", w: "『이 사람을 보라』 · 「나는 왜 이렇게 영리한가」", s: ["『이 사람을 보라』(1888) · 앤서니 루도비치 번역 · Project Gutenberg", "https://www.gutenberg.org/ebooks/52190"] },
+    ],
+    story: "‘신은 죽었다’의 철학자. 자기 삶을 돌아본 마지막 책 『이 사람을 보라』에서, 소년 시절엔 밤새 술을 마시며 라틴어 에세이를 쓰기도 했지만 나이가 들수록 술에 반대하게 됐다고 썼다. 정신을 다루는 사람이라면 술을 완전히 끊어야 한다는 게 그의 결론이었다." },
 ];
 
 /* 사진: Wikimedia Commons — [작가, 라이선스, 파일 페이지] */
@@ -768,10 +857,19 @@ const CREDITS = {
   "clapton-2": ["Raph_PH", "CC BY 2.0", "File:Eric_Clapton_-_Royal_Albert_Hall_-_Wednesday_24th_May_2017_EricClaptonRAH240517-30_%2834987232355%29_%28cropped%29.jpg"],
   "clapton-3": ["Steve Proctor", "CC BY-SA 4.0", "File:Eric_Clapton_01May2015.jpg"],
   "adams": ["Jade Moulds", "Public domain", "File:Tony_Adams_2017_portrait.jpg"],
-  "hwang": ["Republic of Korea", "CC BY-SA 4.0", "File:Hwang_Jung-min_in_July_2026_%28cropped%29.jpg"],
-  "songeuni": ["tenasia10", "CC BY 3.0", "File:%28TV10%29_%EC%82%AC%EC%9D%B4%EB%8B%A4_%EA%B9%80%EC%98%81%EC%B2%A0%3D%EC%9D%B4%EC%98%81%EC%9E%90%EB%8A%94_%EC%9E%90%EC%9B%85%EB%8F%99%EC%B2%B4_%EC%86%A1%EC%9D%80%EC%9D%B4_1m46s.jpg"],
-  "cha": ["sisaprime (일부 잘라 씀)", "CC BY 4.0", "File:%EC%98%81%ED%99%94_%27%EC%8B%A0%EA%B3%BC_%ED%95%A8%EA%BB%98%27_%EC%A3%84_%EC%99%80_%EB%B2%8C_20%EC%9D%BC_%EA%B0%9C%EB%B4%89_%2822%29.jpg"],
-  "cha-2": ["sisaprime (일부 잘라 씀)", "CC BY 4.0", "File:%EC%98%81%ED%99%94_%27%EC%8B%A0%EA%B3%BC_%ED%95%A8%EA%BB%98%27_%EC%A3%84_%EC%99%80_%EB%B2%8C_20%EC%9D%BC_%EA%B0%9C%EB%B4%89_%2819%29.jpg"],
+  "shakespeare": ["Attributed to John Taylor (Chandos portrait)", "Public domain", "File:The_Chandos_Shakespeare_%285294038%29.jpg"],
+  "dostoevsky": ["Vasily Perov", "Public domain", "File:Vasily_Perov_-_%D0%9F%D0%BE%D1%80%D1%82%D1%80%D0%B5%D1%82_%D0%A4.%D0%9C.%D0%94%D0%BE%D1%81%D1%82%D0%BE%D0%B5%D0%B2%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_-_Google_Art_Project.jpg"],
+  "london": ["published by L C Page and Company Boston 1903", "Public domain", "File:Jack_London_young.jpg"],
+  "london-2": ["Genthe, Arnold", "Public domain", "File:Portrait_photograph_of_Jack_London_LOC_agc.7a10260.jpg"],
+  "bronte": ["Branwell Brontë", "Public domain", "File:Anne_Bront%C3%AB_by_Patrick_Branwell_Bront%C3%AB_restored.jpg"],
+  "montaigne": ["anonymous", "Public domain", "File:Montaigne-Dumonstier.jpg"],
+  "seneca": ["Marcus Cyron", "CC BY-SA 3.0", "File:Duble_herma_of_Socrates_and_Seneca_Antikensammlung_Berlin_02.jpg"],
+  "plato": ["Marie-Lan Nguyen", "Public domain", "File:Plato_Silanion_Musei_Capitolini_MC1377_%28cropped%29.jpg"],
+  "aristotle": ["After Lysippos", "Public domain", "File:Aristotle_Altemps_Inv8575.jpg"],
+  "franklin": ["Joseph-Siffred Duplessis", "Public domain", "File:Joseph_Siffrein_Duplessis_-_Benjamin_Franklin_-_Google_Art_Project.jpg"],
+  "lincoln": ["Alexander Gardner", "Public domain", "File:Abraham_Lincoln_O-77_matte_collodion_print_%283x4_close_cropped%29.jpg"],
+  "nietzsche": ["Friedrich Hermann Hartmann", "Public domain", "File:Nietzsche187a.jpg"],
+  "zola": ["Nadar", "Public domain", "File:%C3%89mile_Zola_Nadar.jpg"],
 };
 
 /* ──────────────────────────────────────────────────────────── */
@@ -912,14 +1010,14 @@ function buildCard(id) {
     ${file
       ? `<div class="wash" style="background-image:url(photos/wash/${file}.jpg?v=${PHOTO_V})"></div>
     <div class="photo"><div class="kb"><img alt="${esc(p.name)}" decoding="async" draggable="false"></div></div>`
-      : `<div class="wash"></div><div class="initial" aria-hidden="true">${esc(p.name.split(" ").map(w => w[0]).join(""))}</div>`}
+      : `<div class="wash"></div><div class="initial" aria-hidden="true">${esc(p.mark || p.name.split(" ").map(w => w[0]).join(""))}</div>`}
     <div class="top-shade"></div>
     <div class="copy">
       <div>${q.roman ? "" : '<span class="qmark" aria-hidden="true">“</span>'}
         <blockquote class="${quoteClass(q, lang)}" lang="${lang}">${esc(q.t).replace(/\n/g, "<br>")}</blockquote></div>
       <p class="ko" lang="ko">${esc(q.ko)}</p>
-      <div class="byline"><div class="who"><span class="name">${esc(p.name)}</span><span class="role">${esc(p.ko)} · ${esc(p.role)}</span></div>
-        <button class="more glass" type="button" data-story>이야기 ${CHEVRON_UP}</button></div>
+      <div class="byline"><div class="who"><span class="name">${esc(p.name)}</span><span class="role">${esc(p.ko)} · ${esc(q.w || p.role)}</span></div>
+        <button class="more glass" type="button" data-story>${p.kind === "text" ? "배경" : "이야기"} ${CHEVRON_UP}</button></div>
     </div>`;
   card._qi = qi; card._pi = pi; card._focus = focus;
   const img = card.querySelector("img");
@@ -1105,14 +1203,18 @@ function openStory() {
   if (current === "you") return openMine();
   const p = BY_ID[current];
   if (!p || !cur) return;
-  const s = parseSince(p.since), lang = p.lang || "en";
-  const end = p.died ? parseSince(p.died).date : new Date(), e = elapsed(s.date, end);
+  const lang = p.lang || "en", isText = p.kind === "text";
   $("s-name").textContent = p.name;
   $("s-sub").textContent = `${p.ko} · ${p.role}`;
-  $("s-since").textContent = sinceShort(s, p.approx);
-  if (p.died) { $("s-count-label").textContent = `${end.getFullYear()}년 별세까지`; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
-  else if (s.prec === "year") { $("s-count-label").textContent = "지난 해"; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
-  else { $("s-count-label").textContent = "지난 날"; $("s-count").textContent = (s.prec === "month" ? "약 " : "") + e.days.toLocaleString("ko-KR") + "일"; }
+  $("s-facts").hidden = isText;
+  $("s-h").textContent = isText ? "술에 대한 글귀" : "이 사람이 한 말";
+  if (!isText) {
+    const s = parseSince(p.since), end = p.died ? parseSince(p.died).date : new Date(), e = elapsed(s.date, end);
+    $("s-since").textContent = sinceShort(s, p.approx);
+    if (p.died) { $("s-count-label").textContent = `${end.getFullYear()}년 별세까지`; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
+    else if (s.prec === "year") { $("s-count-label").textContent = "지난 해"; $("s-count").textContent = (p.approx ? "약 " : "") + e.years + "년"; }
+    else { $("s-count-label").textContent = "지난 날"; $("s-count").textContent = (s.prec === "month" ? "약 " : "") + e.days.toLocaleString("ko-KR") + "일"; }
+  }
   $("s-story").textContent = p.story;
   const order = [cur._qi, ...p.quotes.map((_, i) => i).filter(i => i !== cur._qi)];
   $("s-quotes").innerHTML = order.map((i, k) => {
@@ -1120,13 +1222,13 @@ function openStory() {
     return `<figure class="orig${k === 0 ? " now" : ""}">
       <blockquote lang="${lang}">${esc(quoteText(q, lang))}</blockquote>
       <p lang="ko">${esc(q.ko)}</p>
-      <figcaption>${esc(q.s[0])} · <a href="${esc(q.s[1])}" target="_blank" rel="noopener">원문</a></figcaption>
+      <figcaption>${q.w ? esc(q.w) + "<br>" : ""}${esc(q.s[0])} · <a href="${esc(q.s[1])}" target="_blank" rel="noopener">원문</a></figcaption>
     </figure>`;
   }).join("");
   const file = (p.photos[cur._pi] || [])[0], cr = file && CREDITS[file];
   $("s-credit").innerHTML = cr
     ? `사진 · ${esc(cr[0])} · ${esc(cr[1])} · <a href="https://commons.wikimedia.org/wiki/${cr[2]}" target="_blank" rel="noopener">Wikimedia Commons</a>`
-    : "자유롭게 쓸 수 있는 사진이 없어 색으로만 보여줘요.";
+    : isText ? "" : "자유롭게 쓸 수 있는 사진이 없어 색으로만 보여줘요.";
   open($("story"));
 }
 

@@ -9,7 +9,9 @@ const IDS = [
   "florence", "hardy", "hathaway", "holland", "hopkins", "jackson", "king", "lowe",
   "matsushige", "mcgregor", "oldman", "radcliffe", "ringo", "slash", "washington",
   "tolstoy", "lamott", "billw", "bford", "aldrin", "bush", "ferguson", "maron", "delaney",
-  "clapton", "adams", "hwang", "cha", "songeuni",
+  "clapton", "adams",
+  "shakespeare", "dostoevsky", "london", "bronte", "zola", "montaigne", "seneca", "plato", "aristotle",
+  "franklin", "lincoln", "nietzsche",
 ];
 const PHOTOS = IDS.flatMap(id => [`photos/${id}.jpg${V}`, `photos/wash/${id}.jpg${V}`]);
 const CORE = ["./", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", ...PHOTOS];
