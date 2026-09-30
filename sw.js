@@ -39,10 +39,12 @@ function put(req, res) {
 self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
+  if (new URL(req.url).searchParams.has("fresh")) return;   // the page's own update check: straight to the network
 
-  // The page itself: network first so edits show up, cache when offline.
+  // The page itself: always ask the server (a quick ETag check), so updates show up
+  // right away instead of after GitHub Pages' 10-minute cache; fall back offline.
   if (req.mode === "navigate") {
-    e.respondWith(fetch(req).then(res => put(req, res)).catch(() => caches.match(req).then(r => r || caches.match("./"))));
+    e.respondWith(fetch(req, { cache: "no-cache" }).then(res => put(req, res)).catch(() => caches.match(req).then(r => r || caches.match("./"))));
     return;
   }
 

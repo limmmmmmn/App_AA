@@ -189,6 +189,13 @@ a { color: var(--tint-text); text-decoration: none; }
 .hint span { font: 500 13px/1 var(--f-text); padding: 10px 15px; border-radius: 999px; color: var(--label); }
 .hint.gone { opacity: 0; }
 
+.update {
+  position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 62px); z-index: 4; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  padding: 10px 16px; border-radius: 999px; font: 600 14px/1 var(--f-text); letter-spacing: -.01em;
+}
+.update .dot { width: 8px; height: 8px; border-radius: 50%; background: #30d158; box-shadow: 0 0 10px #30d158; }
+
 /* ── sheets ────────────────────────────────── */
 .scrim { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.38); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
 .scrim.open { opacity: 1; pointer-events: auto; }
@@ -268,6 +275,7 @@ a { color: var(--tint-text); text-decoration: none; }
     </header>
 
     <div class="hint gone" id="hint" aria-hidden="true"><span class="glass">옆으로 밀면 다음 사람 · 위로 밀면 이야기</span></div>
+    <button class="update glass" id="update" type="button" hidden><span class="dot"></span>새 버전이 나왔어요 · 탭해서 적용</button>
   </main>
 </div>
 
@@ -1340,12 +1348,31 @@ document.addEventListener("keydown", e => {
 
 let rz;
 addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => deck.querySelectorAll(".card").forEach(place), 80); });
-document.addEventListener("visibilitychange", () => { if (!document.hidden) renderMe(); });
+/* ── updates ─────────────────────────────── */
+// The home-screen app often resumes instead of reloading, so when it comes back
+// into view it asks the server for the current version and offers a one-tap update.
+const APP_VERSION = "2026-09-30.4";
+let newVersion = null;
+async function checkForUpdate() {
+  if (location.protocol !== "https:" && location.hostname !== "localhost") return;
+  try {
+    const html = await (await fetch(`index.html?fresh=${Date.now()}`, { cache: "no-store" })).text();
+    const m = html.match(/const APP_VERSION = "([^"]+)"/);
+    if (m && m[1] !== APP_VERSION) { newVersion = m[1]; $("update").hidden = false; }
+  } catch (e) {}
+  if (navigator.serviceWorker) navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {});
+}
+$("update").addEventListener("click", () => location.replace(`./?v=${encodeURIComponent(newVersion || Date.now())}`));
+// tidy the address after an update (window.history: `history` in this script is the deck's own list)
+if (location.search) window.history.replaceState(null, "", location.pathname);
+
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { renderMe(); checkForUpdate(); } });
 
 /* ── go ──────────────────────────────────── */
 renderMe();
 start();
 showHint();
+setTimeout(checkForUpdate, 3000);
 
 // Offline cache for the home-screen app (skipped where there is no manifest)
 if ("serviceWorker" in navigator && document.querySelector('link[rel="manifest"]')) {
