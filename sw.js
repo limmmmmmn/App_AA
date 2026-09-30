@@ -8,9 +8,9 @@ const IDS = [
   "alice", "brolin", "cooper", "curtis", "downey", "elton", "eminem", "farrell",
   "florence", "hardy", "hathaway", "holland", "hopkins", "jackson", "king", "lowe",
   "matsushige", "mcgregor", "oldman", "radcliffe", "ringo", "slash", "washington",
-  "tolstoy", "lamott", "billw", "bford", "aldrin", "bush", "ferguson", "maron", "delaney",
+  "tolstoy", "lamott", "billw", "bford", "aldrin", "ferguson", "maron", "delaney",
   "clapton", "adams",
-  "shakespeare", "dostoevsky", "london", "bronte", "zola", "montaigne", "seneca", "plato", "aristotle",
+  "shakespeare", "dostoevsky", "bronte", "zola", "montaigne", "seneca", "plato", "aristotle",
   "franklin", "lincoln", "nietzsche",
 ];
 const PHOTOS = IDS.flatMap(id => [`photos/${id}.jpg${V}`, `photos/wash/${id}.jpg${V}`]);
